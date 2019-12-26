@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Factores Caracteristicas' }}{% endblock %}
+
+{% block body %}
+
+    <h1>Datos Factores:</h1>
+    <p>{{ fc.getIdCaract() }}</p>
+    <p>{{ fc.getDerechoDeEmision() }}</p>
+    <p>{{ fc.getAjustePorHijo() }}</p>
+    <p>{{ fc.getDescuentoPorUnidadAdicional() }}</p>
+    <hr>
+    <a href="/">Go Back</a>
+{% endblock %}

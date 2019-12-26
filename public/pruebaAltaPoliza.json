@@ -1,0 +1,132 @@
+{
+	"sumaAsegurada": 200000,
+	"kmAnio":15000,
+	"fechaInicioVigencia": "2019-12-10",
+	"fechaFinVigencia":"2020-06-10",
+	"premio": 154000,
+	"importePorDescuento": 2000,
+	"ultimoDiaPago":"2020/06/03",
+	"montoTotalAAbonar":152000,
+	"cliente":{
+		"id": 15,
+		"dni":38524142,
+		"cuilCuit":21385241422,
+		"fechaNac": "1975-01-05",
+		"apellido":"Tune",
+		"nombre": "Otho",
+		"email":"othotn@gmail.com",
+		"profesion":"Mecánico",
+		"anioRegistro":"2015",
+		"enumTipoDni": {
+			"id": 1,
+			"descripcion": "DNI"
+		},
+		"enumCondIva":{
+			"id": 1,
+			"descripcion":"Responsable Inscripto"
+		},
+		"direccion":{
+			"id": 1, 
+			"nombreCalle":"4 de Enero",
+			"nroCalle": 2400,
+			"numDpto": 0,
+			"localidad":{
+				"id":1,
+				"nombreLocalidad":"Santa Fe",
+				"codigoPostal":3000
+			}
+		},
+		"enumEstadoCivil":{
+			"id": 3,
+			"descripcion":"Casado"
+		},
+		"enumSexo":{
+			"id":1,
+			"descripcion":"Masculino"
+		}
+	},
+	"tipoCobertura":{
+		"id": 1,
+		"nombre": "Resp. Civil"
+	},
+
+	"localidad":{
+		"id": 1,
+		"nombreLocalidad":"Santa Fe",
+		"codigoPostal":3000
+	},
+	"formapago":{
+		"id": 2,
+		"descripcion": "Semestral"
+	},
+	"siniestroFC":{
+		"id":1,
+		"descripcion": "un siniestro"
+	},
+	"vehiculo":{
+		"anioVehiculo":2006,
+		"motor":"ASDF123457",
+		"chasis":"154214FCDFG",
+		"patente":"ADF-1234",
+		"modelo":{
+			"id":3,
+			"nombre":"Mustang",
+			"marca":{
+				"id":4,
+				"nombre":"Mitsubishi"
+			}
+		},
+		"medidasSeguridad": [
+			{
+				"id":1,
+				"descripcion":"Alarma"
+
+			},
+			{
+				"id":2,
+				"descripcion":"Rastreo Vehicular"
+
+			},
+			{
+				"id":4,
+				"descripcion":"Garage"
+
+			}
+		]
+	},
+	"listaHijos":[
+		{
+			"dni":38457321,
+			"fechaNac":"1996-02-15",
+			"estadoCivil":{
+				"id":4,
+				"descripcion":"Soltero"
+			},
+			"enumSexo":{
+				"id":1,
+				"descripcion":"Masculino"
+			}
+		},
+		{
+			"dni":38457322,
+			"fechaNac":"1996-03-15",
+			"estadoCivil":{
+				"id":4,
+				"descripcion":"Soltero"
+			},
+			"enumSexo":{
+				"id":2,
+				"descripcion":"Femenino"
+			}
+		}
+
+	],
+	"listaCuotas":[
+		{
+			"numCuota":1,
+			"fechaVencimiento":"2020/06/03",
+			"monto":152000
+			
+		}
+	]
+}

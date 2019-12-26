@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'Marca' }}{% endblock %}
+
+{% block body %}
+
+    <h1>Datos Marca Guardada:</h1>
+    <p>{{ marca.getId() }}</p>
+    <p>{{ marca.getNombre() }}</p>
+    <hr>
+    <a href="/">Go Back</a>
+{% endblock %}
