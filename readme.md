@@ -25,7 +25,6 @@ php bin/console doctrine:schema:update --dump-sql
 php bin/console doctrine:schema:update --force
 
 
-
 #Cosa que toqué-> Archivo fos_rest. Agregué esto.
 
 fos_rest:
@@ -52,3 +51,5 @@ php bin/console doctrine:schema:validate
 #Fechas PHP
 https://www.php.net/manual/es/datetime.examples-arithmetic.php
 
+#QueryBuilder
+https://www.doctrine-project.org/projects/doctrine-orm/en/2.7/reference/query-builder.html

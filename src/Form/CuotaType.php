@@ -25,6 +25,8 @@ class CuotaType extends AbstractType
                 'widget' => 'single_text',
                 'format' => 'yyyy/MM/dd'))
             ->add('monto')
+            ->add('recargos')
+            ->add('bonificacion_pago_adelantado')
         ;
 
     }

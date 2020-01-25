@@ -39,6 +39,7 @@ use App\Services\DAO\TipoCoberturaDAO;
 use App\Services\SistemaFinancieroService;
 
 //FOS-Route
+use App\Services\ValoresAutomoviles;
 use DateInterval;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -99,31 +100,354 @@ class PolizaController extends FOSRestController{
 
         $this->sistemaFinancieroService = $sistemaFinanciero;
 
-
-
     }
 
 
+
+
+
+ //CU1. Alta de Poliza.
+
     /**
-     * Retorna una poliza con nroPoliza = id. Busqueda de Poliza por Nro. No requiere que sea vigente
+     * Retorna la suma asegurada para los vehiculos. Siempre retorna el mismo valor
+     *
+     * @return int
+     */
+    public function getSumaaseguradaAction(){
+
+        return ValoresAutomoviles::getSumaAsegurada();
+
+    }
+
+    /**
+     * Verifica si la fecha de nacimiento es mayor a 18 años y menor a 30 respecto de la actual
+     * $fechaNacimiento -> AAAA-MM-DD
      *
      * @View(serializerEnableMaxDepthChecks=true)
-     * @param int $id
-     * @return mixed
+     * @param $fechaNacimiento
+     * @return bool
+     * @throws
      */
-    //@View(serializerEnableMaxDepthChecks=true) sirve para serializar los datos y retornarlos en formato json.
-    //Retorna solo los valores de poliza que tienen en tag @Expose.
-    public function getAction(int $id){
+    public function getValidacionfechanacimientoAction($fechaNacimiento){
+
+        $now = new DateTime();
+        $fecha= new DateTime($fechaNacimiento);
+
+        $edad = date_diff($now, $fecha);
+
+        $edad = (int)($edad->format('%Y'));
+        if($edad>17 && $edad<31){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Verifica si chasis tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese chasis
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param string $chasis
+     * @return bool
+     */
+    public function getValidacionchasisAction($chasis){
 
         /** @var EntityManager $em */
-        $em=$this->getDoctrine()->getManager();
+        $em = $this->getDoctrine()->getManager();
         $polizaDAO = new PolizaDAO($em);
-        return $polizaDAO->getObj($id);
+        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+
+        //Estado Vigente/Activa
+        $estado = $estadoPolizaDAO->getObj(1);
+        $cant = $polizaDAO->findVehiculoActivo("chasis", $chasis, $estado);
+
+        if($cant==0){
+
+            return false;
+        }
+        else{
+            return true;
+        }
 
     }
 
 
     /**
+     * Verifica si motor tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese motor
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param string $motor
+     * @return bool
+     */
+    public function getValidacionmotorAction($motor){
+
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $polizaDAO = new PolizaDAO($em);
+        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+
+        //Estado Vigente/Activa
+        $estado = $estadoPolizaDAO->getObj(1);
+
+        $cant = $polizaDAO->findVehiculoActivo("motor", $motor, $estado);
+
+        if($cant==0 || $cant == null){
+
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+
+    /**
+     * Verifica si patente tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con esa patente
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param string $patente
+     * @return bool
+     */
+    public function getValidacionpatenteAction($patente){
+
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $polizaDAO = new PolizaDAO($em);
+        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+
+        //Estado Vigente/Activa
+        $estado = $estadoPolizaDAO->getObj(1);
+        $cant = $polizaDAO->findVehiculoActivo("patente", $patente, $estado);
+
+        if($cant==0 || $cant == null){
+
+            return false;
+        }
+        else{
+            return true;
+        }
+
+    }
+
+
+    /**
+     * Verifica si el vehiculo tiene más de 10 años. De ser asi, solo debería mostrarse la opcion Responsabilidad Civil como tipo de cobertura
+     * Retorna TRUE si tiene más de 10 años
+     * @View(serializerEnableMaxDepthChecks=true)
+     *
+     * @param $anioVehiculo
+     * @return bool
+     */
+    public function getValidacionaniosvehiculoAction($anioVehiculo){
+
+        $now = date('Y');
+        $now = (int)$now;
+
+        if($now - $anioVehiculo > 10){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Verifica que la fecha de inicio de vigencia ingresada no sea menor a la fecha siguiente a la actual y mayor a 1 mes de la fecha actual
+     * Retorna TRUE si la fecha es valida
+     * //TODO Si faltan menos de 24 horas para la siguiente fecha a la actual, el if no lo toma como fecha valida salvo que ponga >=0, pero aceptaría la fecha de hoy
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param $fechaInicio
+     * @return
+     * @throws
+     */
+    public function getValidacionfechainicioAction($fechaInicio){
+
+        $now = new DateTime();
+        $fecha= new DateTime($fechaInicio);
+
+        $dias = date_diff($now, $fecha);
+        $dias=$now->diff($fecha);
+
+        $diferencia = (int)($dias->format('%M'));
+
+        if($diferencia>0) {
+
+            return $dias->format('%y-%m-%d');
+            if((int)$dias->format('%M')<1){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
+        //return $diferencia;
+        return $dias->format('%y-%m-%d');
+    }
+
+
+
+//CU16. Calculo de Premio, Derechos de Emision y Descuentos.
+
+    /**
+     * Retorna Premio, Monto Total y Descuento
+     *
+     * Debe recibir en el request: lo que está en PremioDescType a pesar de que no se usen.
+     * No hay validacion del Request ya que solo retorna valores fijos.
+     *
+     * @param Request $request
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @return mixed
+     * @throws
+     */
+    //TODO Consultar respecto a que hacer con los derechosDeEmision. En teoria se puede calcular despues en base a los valores para el ajuste y los historiales
+    //TODO Consultar respecto a como se representa el descuento, si es un porcentaje que despues calcula el montoTotalAAbonar o es un valor de dinero como lo es el premio
+
+    //CU16 lo retorna, pero en diagrama, Poliza no tiene el atributo derechosDeEmision
+    public function getCalculopremiodescAction(Request $request){
+        //Prima = precio del seguro
+        //Premio = Prima mas ajustes sobre dicha prima.
+        //Descuentos = no se si es porcentaje o es una suma.
+
+        $premio = 100000;
+        $descuento = 0.30; //por ahora asumo que es un porcentaje y que en base al premio se calcula aparte.
+        $derechosDeEmision=30000; //por ahora asumo que es un valor que se le suma a la prima para obtener el premio
+
+        $response = new JsonResponse();
+        $response->setData(['premio' => $premio, 'descuento' => $descuento,'derechos_de_emision' => $derechosDeEmision]);
+
+        return $response;
+
+    }
+
+    /**
+     * Se encarga de calcular el monto total a abonar dado el premio y los descuentos retornados por el cu16
+     */
+    //TODO Ver si es necesario. Basicamente es operación bastante sencilla. Considerar realizarlo en el metodo anterior
+    public function getMontototalAction(){
+
+    }
+
+//CU1. Alta Poliza
+
+    /**
+     * Calcula fecha fin de vigencia. Todas las polizas duran 6 meses como máximo
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param $fechaInicioVigencia
+     * @return string
+     * @throws
+     */
+    //TODO Revisar bien los valores retornados
+
+    public function getFechafinvigenciaAction($fechaInicioVigencia){
+
+        $now = new DateTime($fechaInicioVigencia);
+
+        $now->modify("+1 day");
+        $now->modify("+6 months");
+
+        return $now->format( 'Y/m/d' );
+
+    }
+
+
+    /**
+     * Armado de lista de cuotas.
+     *
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param $montoTotal //Para calcular el monto de cada cuota
+     * @param $cant //1 si es semestral, 6 si es mensual. Todas las polizas tienen cuotas asociadas.
+     * @param $fechaInicioVigencia //Para calcular las fechas de pago
+     * @return ArrayCollection
+     * @throws
+     */
+    public function getCalculocuotasAction($montoTotal, $cant, $fechaInicioVigencia){
+
+        //Arranca en 1 el numero de cuota porque la BD actua raro con el número 0
+        $i=2;
+        //Crea el arreglo para agregar las cuotas
+        $cuotas = new ArrayCollection();
+
+        //Crea una entidad de tipo Cuota
+        $cuota = new Cuota();
+
+        //Verifica si el pago es semestral. Si lo es, crea una sola cuota
+
+        if($cant==1){
+
+            $cuota->setNumCuota(1);
+            $cuota->setMonto($montoTotal);
+
+            //Fecha de vencimiento es dia anterior a entrada en vigencia
+            $fecha = new DateTime($fechaInicioVigencia);
+            $fecha->modify("-1 day");
+
+
+            $cuota->setFechaVencimiento($fecha);
+            $cuotas->add($cuota);
+
+        }
+
+        $cuota->setNumCuota(1);
+        $cuota->setMonto($montoTotal);
+
+        $fecha = new DateTime();
+        $cuota->setFechaVencimiento($fecha);
+        $cuotas->add($cuota);
+
+        //Crea con fecha actual
+        while($i<=$cant) {
+
+            $cuota = new Cuota();
+            $cuota->setId(0);
+            $cuota->setNumCuota($i);
+            $cuota->setMonto($montoTotal/6);
+
+            $fecha = new DateTime(''.$fecha->format('Y-m-d'));
+
+            $fecha->modify('+30 days');
+            $cuota->setFechaVencimiento($fecha);
+            $cuotas->add($cuota);
+
+            $i++;
+            //$fecha->add(new DateInterval('P1M'));
+
+        }
+        return $cuotas;
+    }
+
+
+
+
+
+
+
+
+    /**
+     * VER ESTO!!!
+     * Calcula fecha ultimo pago. Fecha anterior al dia de entrada en vigencia, o sea, la fecha actual.
+     * Valido para PAGO SEMESTRAL.
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     *
+     */
+    public function getFechaultimopagoAction(){
+
+        $now   = new DateTime();
+
+        //return $now;
+
+        return $now->format( 'Y/m/d' );
+
+    }
+
+    /**
+     * Almacena en base de datos una poliza nueva.
+     *
      * @param Request $request
      * @View(serializerEnableMaxDepthChecks=true)
      * @return null
@@ -150,253 +474,102 @@ class PolizaController extends FOSRestController{
 
         $poliza = new Poliza();
 
+        //Valores del Json enviado en Request se almacenan en una entidad Poliza
         $objForm = $this->createForm(PolizaType::class, $poliza, ['em'=> $em]);
         $objForm->handleRequest($request);
 
         if ($objForm->isSubmitted() && $objForm->isValid()) {
 
-            $nroPoliza = $poliza->getNroPoliza();
-            $p = $polizaDAO->getObj($nroPoliza);
+            //TODO Consultar. Entra al if de arriba si alguno de los campos es nulo, el error salta luego de procesar todo (en el persist).
 
-            //Consultar.
-            /*if($p){
-
-                $r = new Response("La Poliza ya Existe");
-                $r->setStatusCode(529);
-                return $r;
-            }*/
-
-            //TODO Consultar. Entra al if primero si nro de poliza es nulo, el error salta luego de procesar todo (en el persist).
-            /*if($poliza->getNroPoliza()==null){
-
-                    $r = new Response("Poliza: Nro Poliza Nulo");
-                    $r->setStatusCode(500);
-                    return $r;
-            }*/
-
-             //Agrega Cliente a Poliza.
-                $cliente = $objForm->get('cliente')->getData();
-                $c = $clienteDAO->getObj($cliente->getId());
+            //Agrega Cliente a Poliza.
+                $c = $clienteDAO->getObj($poliza->getCliente()->getId());
                 $poliza->setCliente($c);
 
+           //Calculo de nro de poliza.
+                $nroPoliza = $this->getCalculonropolizaAction($poliza->getCliente()->getId());
+                $poliza->setNroPoliza($nroPoliza);
 
-             //Agrega valores de poliza
-                /*$poliza ->setSumaAsegurada($objForm->get('sumaAsegurada')->getData());
-                $poliza ->setPremio($objForm->get('premio')->getData());
-                $poliza->setImportePorDescuento($objForm->get('importePorDescuento')->getData());
-                $poliza->setMontoTotalAAbonar($objForm->get('montoTotalAAbonar')->getData());
-                */
-
-             //Siempre es "GENERADA" al crearse la poliza. Por eso el 4.
+           //Estado de Poliza es "GENERADA" al crearse. En la BD, tiene el id 4
                 $estadoPoliza = $estadoPolizaDAO->getObj(4);
                 $poliza->setEstadopoliza($estadoPoliza);
 
-             //Este se obtiene desde el DAO basandose en los KManio ingresados desde el frontend
+           //Este se obtiene desde el DAO basandose en los KManio ingresados desde el frontend
                 $ajusteKM = $ajusteKMDAO->getObj($poliza->getKmAnio());
                 $poliza->setAjusteskm($ajusteKM);
-                //$poliza ->setKmAnio($objForm->get('kmAnio')->getData());
 
-
-              //Agrega las fechas. Se calculan en el front
-                /*$poliza ->setFechaFinVigencia($objForm->get('fechaFinVigencia')->getData());
-                $poliza ->setFechaInicioVigencia($objForm->get('fechaInicioVigencia')->getData());
-                $poliza->setUltimoDiaPago($objForm->get('ultimoDiaPago')->getData());
-                */
-
-            //Forma de pago.
-                $formaPago = $objForm->get('formapago')->getData();
-                $fp = $formaPagoDAO -> getObj($formaPago->getId());
+           //Forma de pago.
+                $fp = $formaPagoDAO->getObj($poliza->getFormapago()->getId());
                 $poliza->setFormapago($fp);
 
-            //Localidad (Domicilio de Riesgo)
-                $localidad=$objForm->get('localidad')->getData();
-                $l = $localidadDAO->getObj($localidad->getId());
+           //Localidad (Domicilio de Riesgo)
+                $l = $localidadDAO->getObj($poliza->getLocalidad()->getId());
                 $poliza -> setLocalidad($l);
 
+           //Vehiculo
+                $vehiculo = $poliza->getVehiculo();
 
-            //Vehiculo
-                $vehiculo = $objForm->get('vehiculo')->getData();
+                //Medidas de Seguridad
                 $medidas = new ArrayCollection();
 
                 foreach($vehiculo->getListaMedidas() as $medida){
                     $medidas->add($medidasSeguridadDAO->getObj($medida->getId()));
                 }
 
-                $vehiculo->setModelo($modeloDAO->getObj($vehiculo->getModelo()->getId()));
                 $vehiculo->setListaMedidas($medidas);
 
+                //Modelo de Vehiculo
+                $vehiculo->setModelo($modeloDAO->getObj($vehiculo->getModelo()->getId()));
 
                 $poliza->setVehiculo($vehiculo);
 
-              //Tipo Cobertura
-                $tipoCob = $objForm->get('tipo_cobertura')->getData();
-                $tc = $tipoCoberturaDAO->getObj($tipoCob->getId());
+
+           //Tipo Cobertura
+                $tc = $tipoCoberturaDAO->getObj($poliza->getTipoCobertura()->getId());
                 $poliza -> setTipoCobertura($tc);
 
-             //SiniestrosFC
-                $siniestros = $objForm->get('siniestro_FC')->getData();
-                $s = $siniestrosDAO->getObj($siniestros->getId());
+
+           //SiniestrosFC
+                $s = $siniestrosDAO->getObj($poliza->getSiniestroFC()->getId());
                 $poliza -> setSiniestroFC($s);
 
 
-             //Hijos
-                 if (is_array($objForm->get('lista_hijos')->getData()) || is_object($objForm->get('lista_hijos')->getData())) {
-                     $poliza->setListaHijos($objForm->get('lista_hijos')->getData());
+           //Hijos
+                 if (is_array($poliza->getListaHijos()) || is_object($poliza->getListaHijos())) {
+
                      foreach ($poliza->getListaHijos() as $hijo) {
+
                          $hijo->setPoliza($poliza);
                          $hijo->setEnumSexo($enumSexoDAO->getObj($hijo->getEnumSexo()->getId()));
                          $hijo->setEstadoCivil($enumEstadoCivil->getObj($hijo->getEstadoCivil()->getId()));
+
                      }
                  }
 
-             //Cuotas
-                if (is_array($objForm->get('lista_cuotas')->getData()) || is_object($objForm->get('lista_cuotas')->getData())) {
+           //Cuotas
+                //TODO Validacion de listado de cuotas nulo, consultar donde se realizaria.
+                if (is_array($poliza->getListaCuotas()) || is_object($poliza->getListaCuotas())) {
                     /** @var Cuota $cuota */
-                    $poliza->setListaCuotas($objForm->get('lista_cuotas')->getData());
                     foreach ($poliza->getListaCuotas() as $cuota) {
                         $cuota->setPoliza($poliza);
                     }
                 }
 
-             //Factores de Caracteristicas es siempre el mismo
+
+           //Factores de Caracteristicas es siempre el mismo
                 $factoresCaracteristicas= $factoresCDAO->getObj(1);
                 $poliza->setFactores($factoresCaracteristicas);
 
-
+           //Almacena la Poliza en la BD
                 $polizaDAO->save($poliza);
 
                 return $poliza;
 
             }
 
+        //Si la estructura JSON no concuerda con el Form o no es válido, retorna error.
         return $objForm;
 
-
-    }
-
-
-    /**
-     * @param Request $request
-     * @View(serializerEnableMaxDepthChecks=true)
-     * @return mixed
-     * @throws
-     */
-    //TODO Mismo problema que Busqueda Cliente
-    public function getCalculopremiodescAction(Request $request)
-    {
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-
-
-        $clienteDAO = new ClienteDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
-        $ajusteKMDAO = new AjustesKMDAO($em);
-        $localidadDAO = new LocalidadDAO($em);
-        $medidasSeguridadDAO = new MedidasSeguridadDAO($em);
-        $modeloDAO = new ModeloDAO($em);
-        $tipoCoberturaDAO = new TipoCoberturaDAO($em);
-        $siniestrosDAO = new SiniestrosDAO($em);
-        $factoresCDAO = new FactoresCDAO($em);
-
-
-        $objForm = $this->createForm(PremioDescType::class, null, ['em'=> $em]);
-        //$objForm->handleRequest($request);
-        $objForm->submit($request->get($objForm->getData()), false);
-
-        if ($objForm->isSubmitted()) {
-            if($objForm->isValid()) {
-                //Porcentaje valor según Cobertura
-                $idCobertura = $objForm->get('tipoCobertura')->getData();
-                if ($idCobertura == null) {
-                    return new JsonResponse("tipocobertura nulo");
-
-                }
-
-                $ajusteCobertura = $tipoCoberturaDAO->getObj($idCobertura)->getValor();
-
-                //Porcentaje por Domicilio de Riesgo (Localidad)
-                $ajusteDomicilio = $localidadDAO->getObj($objForm->get("localidad")->getData())->getValor();
-
-
-                //Porcentaje por Modelo de Vehiculo
-                $ajusteModelo = $modeloDAO->getObj($objForm->get("modelo")->getData())->getValor();
-
-                //Porcentaje por Km realizado
-                $ajusteKm=$ajusteKMDAO->getObj($objForm->get("kmAnio")->getData())->getValor();
-
-                //Porcentaje por cada medida de seguridad seleccionada. El porcentaje final es la suma de los porcentajes
-                $ajusteMedidas = 0;
-                if (is_array($objForm->get('medidasSeguridad')->getData()) || is_object($objForm->get('medidasSeguridad')->getData())) {
-
-                    foreach ($objForm->get('medidasSeguridad')->getData() as $medida) {
-
-                        $ajusteMedidas += $medidasSeguridadDAO->getObj($medida)->getValor();
-
-                    }
-                }
-
-                //Porcentaje por cant de siniestros.
-                $ajusteSiniestro = $siniestrosDAO->getObj($objForm->get("cantSiniestros")->getData())->getValor();
-
-                //Porcentaje por cant de hijos. Requiere que se envíe la cantidad de hijos nomás. El valor se obtiene por defecto con el mismo Id
-                $fc = $factoresCDAO->getObj(0);
-                $ajusteCantHijos = ($fc->getAjustePorHijo()) * ($objForm->get("cantHijos")->getData());
-
-                //Calculo de Prima
-                //Prima Individual =  suma asegurada x tasa de riesgo
-                //Prima = Prima individual x cantidad de pólizas
-                $sumaAsegurada = $objForm->get("sumaAsegurada")->getData();
-                $prima = $sumaAsegurada * $ajusteCobertura;
-                $prima += $prima * ($ajusteMedidas + $ajusteCantHijos + $ajusteDomicilio + $ajusteKm + $ajusteModelo + $ajusteSiniestro);
-
-                //Derechos de Emision
-                //Valor Fijo. Depende de la aseguradora y sus gastos.
-                $derechosEmision = 100;
-
-                //Premio
-                $premio = $prima + $derechosEmision;
-
-                //Descuentos
-                //Obtener cantidad de vehiculos vigentes por cliente. TODO Cantidad vehiculos vigentes
-                $cliente = $clienteDAO->getObj($objForm->get("cliente")->getData());
-                //Estado vigente de poliza
-                $estadoPoliza = $estadoPolizaDAO->getObj(1);
-
-                //TODO Programar findCantVehiculos en ClienteDao
-                $unidades = 0;
-                //$unidades = $this->clienteDAO->findCantVehiculos($cliente, $estadoPoliza);
-                $descuentoPorUnidad = $fc->getDescuentoPorUnidadAdicional();
-                $descuento = $descuentoPorUnidad * $unidades;
-
-                //Tipo de pago Semestral. En caso de ser Semestral hay que contactar con un sistema de gestión financiero (controller?)
-                //Obtiene un valor fijo, pero es necesario simularlo
-                $tipoPago = 1; //o 2, no recuerdo
-                if ($tipoPago == 1) {
-                    //obtener tasa de descuento desde Sistema Financiero
-                    $tasaDescuento = $this->sistemaFinancieroService->obtenerTasaDescuentoPagoSemestral();
-                    $descuento += $tasaDescuento;
-                }
-
-                //Calcular Monto Total para Poliza
-                $montoTotal = $premio - $descuento;
-
-                $response = new JsonResponse();
-                $response->setData(['premio' => $premio]);
-                $response->setData(['descuento' => $descuento]);
-                $response->setData(['montoTotal' => $montoTotal]);
-
-                return $response;
-            }
-            else{
-                $response= new JsonResponse("No es valido");
-                $response->setData($request);
-                return $response;
-            }
-        }
-
-        $response= new JsonResponse("No submitted");
-        $response->setData($request);
-        return $response;
     }
 
 
@@ -411,100 +584,17 @@ class PolizaController extends FOSRestController{
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
 
-        $c = $estadoPolizaDAO->getObj($cliente);
+        $c = $clienteDAO->getObj($cliente);
         $cantPoliza = $polizaDAO->countObj($c);
 
-        //TODO Falta validar si el numero de poliza es mayor a 99 para el cliente
+        //TODO Falta ver cuando cant poliza es mayor a 99
         return 8888*10000000+$c->getId()*100+$cantPoliza+1;
 
     }
 
-
-    /**
-     * Verifica si chasis tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese chasis
-     * @View(serializerEnableMaxDepthChecks=true)
-     * @param string $chasis
-     * @return bool
-     */
-    public function getChasispolizaactivaAction($chasis){
-
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
-
-        //Estado Vigente/Activa
-        $estado = $estadoPolizaDAO->getObj(1);
-
-        $cant = $polizaDAO->findVehiculoActivo("chasis", $chasis, $estado);
-
-        if($cant==0){
-
-            return false;
-        }
-        else{
-            return true;
-        }
-
-    }
-
-    /**
-     * Verifica si motor tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese motor
-     * @View(serializerEnableMaxDepthChecks=true)
-     * @param string $motor
-     * @return bool
-     */
-    public function getMotorpolizaactivaAction($motor){
-
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
-
-        //Estado Vigente/Activa
-        $estado = $estadoPolizaDAO->getObj(1);
-
-        $cant = $polizaDAO->findVehiculoActivo("motor", $motor, $estado);
-
-        if($cant==0 || $cant == null){
-
-            return false;
-        }
-        else{
-            return true;
-        }
-
-    }
-
-    /**
-     * Verifica si patente tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con esa patente
-     * @View(serializerEnableMaxDepthChecks=true)
-     * @param string $patente
-     * @return bool
-     */
-    public function getPatentepolizaactivaAction($patente){
-
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
-
-        //Estado Vigente/Activa
-        $estado = $estadoPolizaDAO->getObj(1);
-        $cant = $polizaDAO->findVehiculoActivo("patente", $patente, $estado);
-
-        if($cant==0 || $cant == null){
-
-            return false;
-        }
-        else{
-            return true;
-        }
-
-    }
 
 
     /**
@@ -527,78 +617,25 @@ class PolizaController extends FOSRestController{
     }
 
 
-    /**
-     * Calcula fecha fin de vigencia
-     * @View(serializerEnableMaxDepthChecks=true)
-     *
-    */
-    public function getFechafinvigenciaAction(){
 
-        $now   = new DateTime();
 
-        //return $now;
-         $now->format( 'Y/m/d' );
-         $now->modify("+1 day");
 
-         $now->modify("+6 months");
-          //$now->modify("+1 week");
-         return $now->format( 'Y/m/d' );
-
-    }
+//CU18. Busqueda de Poliza por número.
 
     /**
+     * Retorna una poliza con nroPoliza = id. Busqueda de Poliza por Nro.
      *
-     * Calcula fecha ultimo pago. Fecha anterior al dia de entrada en vigencia, o sea, la fecha actual
      * @View(serializerEnableMaxDepthChecks=true)
-     *
+     * @param int $id
+     * @return mixed
      */
-    public function getFechaultimopagoAction(){
+    public function getAction(int $id){
 
-        $now   = new DateTime();
+        /** @var EntityManager $em */
+        $em=$this->getDoctrine()->getManager();
+        $polizaDAO = new PolizaDAO($em);
+        return $polizaDAO->getObj($id);
 
-        //return $now;
-
-        return $now->format( 'Y/m/d' );
-
-    }
-
-    /**
-     * Problema con esto
-     * @View(serializerEnableMaxDepthChecks=true)
-     * @param $montoTotal
-     * @return ArrayCollection
-     * @throws
-     */
-    public function getCalculocuotasAction($montoTotal){
-
-        $i=2;
-        $cuotas = new ArrayCollection();
-        $cuota = new Cuota();
-        $cuota->setNumCuota(1);
-        $cuota->setMonto($montoTotal/6);
-
-        $fecha = new DateTime();
-        $cuota->setFechaVencimiento($fecha);
-        $cuotas->add($cuota);
-
-        //Crea con fecha actual
-        while($i<=6) {
-
-            $cuota = new Cuota();
-            $cuota->setNumCuota($i);
-            $cuota->setMonto($montoTotal/6);
-
-            $fecha = new DateTime(''.$fecha->format('Y-m-d'));
-
-            $fecha->modify('+30 days');
-            $cuota->setFechaVencimiento($fecha);
-            $cuotas->add($cuota);
-
-            $i++;
-            //$fecha->add(new DateInterval('P1M'));
-
-        }
-        return $cuotas;
     }
 
 

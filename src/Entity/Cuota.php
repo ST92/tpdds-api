@@ -51,6 +51,7 @@ class Cuota{
     /**
      * @var float
      * @ORM\Column(name="recargos", type="float", precision=10, scale=0, nullable=true)
+     * @Expose
      */
     private $recargos;
 
@@ -58,6 +59,7 @@ class Cuota{
     /**
      * @var float
      * @ORM\Column(name="bonificacion_pago_adelantado", type="float", precision=10, scale=0, nullable=true)
+     * @Expose
      */
     private $bonificacionPagoAdelantado;
 

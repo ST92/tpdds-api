@@ -13,6 +13,7 @@ interface IFactoryDAO
     public function getCuotaDAO($em);
     public function getEnumCondIvaDAO($em);
     public function getEnumEstadoCivilDAO($em);
+    public function getEnumEstadoClienteDAO($em);
     public function getEnumEstadoPolizaDAO($em);
     public function getEnumFormaPagoDAO($em);
     public function getEnumSexoDAO($em);
@@ -28,4 +29,5 @@ interface IFactoryDAO
     public function getSiniestrosDAO($em);
     public function getTipoCoberturaDAO($em);
     public function getVehiculoDAO($em);
+
 }

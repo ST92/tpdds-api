@@ -22,7 +22,15 @@ class PagoType extends AbstractType
         $builder
             ->add('id')
             ->add('monto')
-            ->add('fecha');
+            ->add('fecha')
+            ->add($builder->create('lista_cuotas', CollectionType::class, [
+                'entry_type' => CuotaType::class,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'entry_options' => [
+                    'em' => $options['em']
+                ]
+            ]));
     }
 
     public function configureOptions(OptionsResolver $resolver)

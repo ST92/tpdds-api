@@ -38,8 +38,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ClienteController extends FOSRestController{
 
-    //private $clienteDAO;
-
     /**
      * Retorna un cliente según el id enviado como parametro
      *
@@ -48,6 +46,7 @@ class ClienteController extends FOSRestController{
      * @return Cliente
      */
     public function getAction(int $id){
+
         /** @var EntityManager $em */
 
         $em = $this->getDoctrine()->getManager();
@@ -57,61 +56,54 @@ class ClienteController extends FOSRestController{
 
     }
 
-
     /**
      * Busqueda de clientes
      * Criterios: id, nombre, apellido, tipoDNI, dni
      *
      * @View(serializerEnableMaxDepthChecks=true)
+     *
      * @param Request $request
      * @return object[]|FormInterface
      */
-    //TODO Falta resolver lo del get request. Submit y handleRequest no andan
-    public function cgetAction(Request $request)
-    {
+    //TODO Funciona con los diferentes parámetros pero no funciona recibiendo el request
+    //TODO La validacion de todos los valores en null se hace o en el front end, o se crea un metodo aparte
+    public function cgetAction(Request $request){
+
+        /*
+        $id = $request->request->getInt('id');
+        $apellido = $request->request->getAlpha('apellido');
+        $nombre = $request->query->getAlpha('nombre');
+        $tipo = $request->query->getInt('tipo_dni');
+        $dni = $request->query->getInt('dni');
+        */
+        $id = $request->get('id');
+        $apellido = $request->get('apellido');
+        $nombre = $request->get('nombre');
+        $tipo = $request->get('tipo_dni');
+        $dni = $request->get('dni');
+
+        $tipoDni = null;
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
+        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
+        $estadoClienteDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoClienteDAO($em);
 
-        $busqueda = new BusquedaCliente();
-        $clienteDAO = new ClienteDAO($em);
+        //Busca entidad tipo DNI para luego buscarla en una consulta
+        if($tipo){
 
-        //$objForm=$this->createForm(BusquedaClienteType::class, $busqueda);
-        $objForm = $this->createForm(BusquedaClienteType::class, $busqueda, ['em' => $em]);
-       // $objForm->handleRequest($request);
+            $tipoDNIDAO = DoctrineFactoryDAO::getFactory()->getEnumTipoDNIDAO($em);
+            $tipoDni = $tipoDNIDAO->getObj($tipo);
 
-        if($request->isMethod("GET")) {
-            $objForm->submit($request->request->all());
-
-            //$objForm->submit($request->request->get($objForm->getName()));
         }
-        else{
-            return new Response("no fue get");
-        }
-       if($objForm->isSubmitted()) {
 
-            if($objForm->isValid()){
-                $busqueda = $objForm->getData();
-                $nombre = $objForm->get('nombre')->getData();
-                $apellido = $objForm->get('apellido')->getData();
-                $id = $objForm->get('id')->getData();
-                $dni = $objForm->get('dni')->getData();
-                //$tipoDni = $objForm->get('enumTipoDni')->getData();
-                $tipoDni = $em->getRepository(EnumTipoDni::class)->find(1);
-                $resultado = $clienteDAO->getAllObj($id, $nombre, $apellido, $dni, $tipoDni);
+        //Obtiene el enumEstadoCliente inactivo, despues en el metodo de busqueda, la consulta busca aquellos que no tengan ese enum
+        $estadoCliente = $estadoClienteDAO->getObj(3);
 
-                $r =  new JsonResponse();
-                $r->setData($resultado);
-                $r->setData($busqueda->getNombre());
-                return $resultado;
-            }
-            else{
-                return new Response("no valid");
-                //return $objForm;
-            }
-        }
-        return new Response("no submit");
-        //return $objForm;
+
+        //Busca un cliente dado los criterios
+        return $clienteDAO->getAllObj($id, $nombre, $apellido, $dni, $tipoDni, $estadoCliente);
+
     }
 
 }

@@ -70,6 +70,12 @@ class DoctrineFactoryDAO implements IFactoryDAO{
         return new EnumEstadoCivilDAO($em);
     }
 
+    public function getEnumEstadoClienteDAO($em){
+
+        return new EnumEstadoClienteDAO($em);
+
+    }
+
     public function getEnumEstadoPolizaDAO($em){
 
         return new EnumEstadoPolizaDAO($em);

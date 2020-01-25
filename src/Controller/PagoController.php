@@ -65,7 +65,7 @@ class PagoController extends FOSRestController{
         $objForm->handleRequest($request);
 
         if ($objForm->isSubmitted() && $objForm->isValid()) {
-            $cuotas = $objForm->get('listaCuotas')->getData();
+            $cuotas = $objForm->get('lista_cuotas')->getData();
 
             foreach ($cuotas as $cuota){
 
