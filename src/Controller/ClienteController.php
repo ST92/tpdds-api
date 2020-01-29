@@ -38,6 +38,62 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class ClienteController extends FOSRestController{
 
+//CU1: Actualización de estado de cliente
+
+    //TODO Implementarlo luego de consultar
+    public function getActualizarestadoclienteAction($id){
+
+    }
+
+
+
+//CU17: Busqueda de Clientes
+
+    /**
+     * Busqueda de clientes
+     * Criterios: id, nombre, apellido, tipoDNI, dni
+     *
+     * @param ParamFetcherInterface $paramFetcher
+     *
+     * @View()
+     *
+     * @QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing notes.")
+     * @QueryParam(name="limit", requirements="\d+", default="100", description="How many notes to return.")
+     * @QueryParam(name="order_by", nullable=true, description="Order by fields. Must be an array ie. &order_by[name]=ASC&order_by[description]=DESC")
+     * @QueryParam(name="filters", nullable=true, description="Filter by fields. Must be an array ie. &filters[id]=3")
+     * @QueryParam(name="operators", nullable=true, description="Operator by fields. Must be an array ie. &operators[id]=>")
+     *
+     * @return array
+     *
+     * @throws
+     *
+     */
+    //TODO La validacion de todos los valores en null se hace o en el front end, o se realiza aqui?
+    //TODO Probar
+    public function cgetAction(ParamFetcherInterface $paramFetcher){
+
+        //Obtiene el DAO para realizar la busqueda sobre entidades de tipo Cliente
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
+
+        //Obtiene los parámetros que se usaran para realizar la busqueda
+        $offset = $paramFetcher->get('offset');
+        $limit = $paramFetcher->get('limit');
+        $order_by = !is_null($paramFetcher->get('order_by')) ? $paramFetcher->get('order_by') : array();
+        $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
+        $operators = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('operators') : array();
+
+        //Retorna los resultados obtenidos
+        return [
+            'items' => $clienteDAO->getAllObj($filters, $operators, $order_by, $limit, $offset)
+        ];
+
+    }
+
+
+
+
     /**
      * Retorna un cliente según el id enviado como parametro
      *
@@ -53,56 +109,6 @@ class ClienteController extends FOSRestController{
         $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
 
         return $clienteDAO->getObj($id);
-
-    }
-
-    /**
-     * Busqueda de clientes
-     * Criterios: id, nombre, apellido, tipoDNI, dni
-     *
-     * @View(serializerEnableMaxDepthChecks=true)
-     *
-     * @param Request $request
-     * @return object[]|FormInterface
-     */
-    //TODO Funciona con los diferentes parámetros pero no funciona recibiendo el request
-    //TODO La validacion de todos los valores en null se hace o en el front end, o se crea un metodo aparte
-    public function cgetAction(Request $request){
-
-        /*
-        $id = $request->request->getInt('id');
-        $apellido = $request->request->getAlpha('apellido');
-        $nombre = $request->query->getAlpha('nombre');
-        $tipo = $request->query->getInt('tipo_dni');
-        $dni = $request->query->getInt('dni');
-        */
-        $id = $request->get('id');
-        $apellido = $request->get('apellido');
-        $nombre = $request->get('nombre');
-        $tipo = $request->get('tipo_dni');
-        $dni = $request->get('dni');
-
-        $tipoDni = null;
-
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
-        $estadoClienteDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoClienteDAO($em);
-
-        //Busca entidad tipo DNI para luego buscarla en una consulta
-        if($tipo){
-
-            $tipoDNIDAO = DoctrineFactoryDAO::getFactory()->getEnumTipoDNIDAO($em);
-            $tipoDni = $tipoDNIDAO->getObj($tipo);
-
-        }
-
-        //Obtiene el enumEstadoCliente inactivo, despues en el metodo de busqueda, la consulta busca aquellos que no tengan ese enum
-        $estadoCliente = $estadoClienteDAO->getObj(3);
-
-
-        //Busca un cliente dado los criterios
-        return $clienteDAO->getAllObj($id, $nombre, $apellido, $dni, $tipoDni, $estadoCliente);
 
     }
 

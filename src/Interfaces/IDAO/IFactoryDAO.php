@@ -29,5 +29,6 @@ interface IFactoryDAO
     public function getSiniestrosDAO($em);
     public function getTipoCoberturaDAO($em);
     public function getVehiculoDAO($em);
+    public function getPagoDAO($em);
 
 }

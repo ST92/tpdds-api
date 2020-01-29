@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
@@ -24,6 +25,8 @@ class Pago
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
+     * @Expose
      */
     private $id;
 
@@ -39,7 +42,17 @@ class Pago
      * @ORM\Column(name="fecha", type="date", nullable=false)
      * @Expose
      */
+    //Se puede obtener fecha y hora de pago
     private $fecha;
+
+    //Relación bidireccional con cuotas
+    /**
+     * @ORM\OneToMany(targetEntity="Cuota", mappedBy="pago", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     * @Expose
+     */
+    private $listaCuotas;
+
 
     /**
      * Pago constructor.
@@ -47,6 +60,8 @@ class Pago
     public function __construct()
     {
         $this->id = 0;
+        $this->listaCuotas = new ArrayCollection();
+
     }
 
 
@@ -64,19 +79,6 @@ class Pago
         $this->id = $idPago;
     }
 
-    /**
-     * @return int
-     */
-    public function getMes(){
-        return $this->mes;
-    }
-
-    /**
-     * @param int $mes
-     */
-    public function setMes(int $mes){
-        $this->mes = $mes;
-    }
 
     /**
      * @return float
@@ -92,19 +94,6 @@ class Pago
         $this->monto = $monto;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getHora(){
-        return $this->hora;
-    }
-
-    /**
-     * @param DateTime $hora
-     */
-    public function setHora(DateTime $hora){
-        $this->hora = $hora;
-    }
 
     /**
      * @return DateTime
@@ -118,6 +107,22 @@ class Pago
      */
     public function setFecha(DateTime $fecha){
         $this->fecha = $fecha;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getListaCuotas()
+    {
+        return $this->listaCuotas;
+    }
+
+    /**
+     * @param ArrayCollection $listaCuotas
+     */
+    public function setListaCuotas($listaCuotas)
+    {
+        $this->listaCuotas = $listaCuotas;
     }
 
 

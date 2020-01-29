@@ -22,4 +22,11 @@
             return $this->em->getRepository(Cuota::class)->find($id);
 
         }
+
+        public function save($cuota){
+
+            $this->em->persist($cuota);
+            $this->em->flush();
+
+        }
     }

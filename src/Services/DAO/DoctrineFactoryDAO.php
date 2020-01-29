@@ -162,4 +162,9 @@ class DoctrineFactoryDAO implements IFactoryDAO{
 
     }
 
+    public function getPagoDAO($em){
+
+        return new PagoDAO($em);
+
+    }
 }

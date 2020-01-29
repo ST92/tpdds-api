@@ -9,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class PagoType extends AbstractType
 {
@@ -22,7 +23,10 @@ class PagoType extends AbstractType
         $builder
             ->add('id')
             ->add('monto')
-            ->add('fecha')
+            ->add('fecha', DateType::class, array(
+                'widget' => 'single_text',
+                'format' => 'yyyy/MM/dd'
+            ))
             ->add($builder->create('lista_cuotas', CollectionType::class, [
                 'entry_type' => CuotaType::class,
                 'allow_add' => true,

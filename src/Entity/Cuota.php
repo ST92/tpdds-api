@@ -22,6 +22,7 @@ class Cuota{
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Expose
      */
     private $id;
 
@@ -66,7 +67,7 @@ class Cuota{
     //Este se actualizan al realizar pago
     /**
      * @var Pago
-     * @ORM\ManyToOne(targetEntity="Pago", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Pago",  inversedBy = "listaCuotas", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="pago_id", referencedColumnName="id")
      * })

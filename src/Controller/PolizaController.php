@@ -10,6 +10,7 @@ use App\Entity\FactoresCaracteristicas;
 use App\Entity\Localidad;
 use App\Entity\MedidasSeguridad;
 use App\Entity\Modelo;
+use App\Entity\Pago;
 use App\Entity\SiniestrosFc;
 use App\Entity\TipoCobertura;
 use App\Entity\Cuota;
@@ -365,7 +366,9 @@ class PolizaController extends FOSRestController{
      * @return ArrayCollection
      * @throws
      */
-    public function getCalculocuotasAction($montoTotal, $cant, $fechaInicioVigencia){
+    //TODO Revisar en diagrama si existe una fecha de ultimo pago en Poliza o si solo está en las cuotas
+    //TODO Problema es que solo retorna los argumentos que tienen valor. CuotaType tiene mas atributos que los que retorna este listado
+    public function getCalculoCuotasAction($montoTotal, $cant, $fechaInicioVigencia){
 
         //Arranca en 1 el numero de cuota porque la BD actua raro con el número 0
         $i=2;
@@ -374,9 +377,10 @@ class PolizaController extends FOSRestController{
 
         //Crea una entidad de tipo Cuota
         $cuota = new Cuota();
-
+        if(!$cant){
+            return null;
+        }
         //Verifica si el pago es semestral. Si lo es, crea una sola cuota
-
         if($cant==1){
 
             $cuota->setNumCuota(1);
@@ -385,17 +389,22 @@ class PolizaController extends FOSRestController{
             //Fecha de vencimiento es dia anterior a entrada en vigencia
             $fecha = new DateTime($fechaInicioVigencia);
             $fecha->modify("-1 day");
-
-
+            //Retorna en este formato: 2020-01-25T00:00:00+00:00, pero si fechaInicioVigencia tiene este formato funciona
             $cuota->setFechaVencimiento($fecha);
             $cuotas->add($cuota);
 
+            return $cuotas;
+
         }
 
+        //Pago Mensual
         $cuota->setNumCuota(1);
-        $cuota->setMonto($montoTotal);
 
-        $fecha = new DateTime();
+        //Monto de cada cuota sera el monto total dividido seis.
+        $cuota->setMonto($montoTotal/6);
+
+        $fecha = new DateTime($fechaInicioVigencia);
+        $fecha->modify("-1 day");
         $cuota->setFechaVencimiento($fecha);
         $cuotas->add($cuota);
 
@@ -403,47 +412,26 @@ class PolizaController extends FOSRestController{
         while($i<=$cant) {
 
             $cuota = new Cuota();
+
+            //En la BD, al poner un id igual a cero, se calcula un id de forma automatica
             $cuota->setId(0);
             $cuota->setNumCuota($i);
             $cuota->setMonto($montoTotal/6);
 
             $fecha = new DateTime(''.$fecha->format('Y-m-d'));
 
-            $fecha->modify('+30 days');
+            //TODO Ver si hacerlo por 30 dias o incrementar el mes de uno en uno
+            //$fecha->modify('+30 days');
+            $fecha->modify('+1 Month');
             $cuota->setFechaVencimiento($fecha);
             $cuotas->add($cuota);
 
             $i++;
-            //$fecha->add(new DateInterval('P1M'));
 
         }
         return $cuotas;
     }
 
-
-
-
-
-
-
-
-    /**
-     * VER ESTO!!!
-     * Calcula fecha ultimo pago. Fecha anterior al dia de entrada en vigencia, o sea, la fecha actual.
-     * Valido para PAGO SEMESTRAL.
-     *
-     * @View(serializerEnableMaxDepthChecks=true)
-     *
-     */
-    public function getFechaultimopagoAction(){
-
-        $now   = new DateTime();
-
-        //return $now;
-
-        return $now->format( 'Y/m/d' );
-
-    }
 
     /**
      * Almacena en base de datos una poliza nueva.
@@ -580,6 +568,7 @@ class PolizaController extends FOSRestController{
      * @View(serializerEnableMaxDepthChecks=true)
      * @return mixed
      */
+    //TODO Falta ver cuando cant poliza es mayor a 99
     public function getCalculonropolizaAction($cliente){
 
         /** @var EntityManager $em */
@@ -590,34 +579,10 @@ class PolizaController extends FOSRestController{
         $c = $clienteDAO->getObj($cliente);
         $cantPoliza = $polizaDAO->countObj($c);
 
-        //TODO Falta ver cuando cant poliza es mayor a 99
+
         return 8888*10000000+$c->getId()*100+$cantPoliza+1;
 
     }
-
-
-
-    /**
-     * Calcula fecha de inicio de vigencia. Enunciado dice que se ingresa por actor, no es necesario este metodo
-     * Ver tema de validaciones (fecha menor a la actual)
-     *
-     * @View(serializerEnableMaxDepthChecks=true)
-     *
-     */
-    public function getFechainiciovigenciaAction(){
-
-        $now   = new DateTime();
-
-        //return $now;
-        $now->format( 'Y/m/d' );
-
-        //$now->modify("+6 months");
-        $now->modify("+1 day");
-        return $now->format( 'Y/m/d' );
-    }
-
-
-
 
 
 //CU18. Busqueda de Poliza por número.
@@ -639,4 +604,15 @@ class PolizaController extends FOSRestController{
     }
 
 
+//CU12. Luego de realizar un pago se actualiza el estado de poliza
+
+
+    /**
+     * Debe actualizar el estado de poliza segun los pagos realizados
+     * @param $id
+     */
+    public function putAction($id){
+
+
+    }
 }

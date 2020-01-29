@@ -20,6 +20,7 @@ class CuotaType extends AbstractType
         $pagoTransformer =  new EntityToIdObjectTransformer($options['em'], Pago::class);
 
         $builder
+            ->add('id')
             ->add('num_cuota')
             ->add('fecha_vencimiento', DateType::class, array(
                 'widget' => 'single_text',
