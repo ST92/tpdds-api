@@ -1,0 +1,137 @@
+{
+  "nro_poliza": 8888000001501,
+  "suma_asegurada": 200000,
+  "km_anio":15000,
+  "fecha_inicio_vigencia": "2019/12/10",
+  "fecha_fin_vigencia":"2020/06/10",
+  "premio": 154000,
+  "importe_por_descuento": 2000,
+  "ultimo_dia_pago":"2020/06/03",
+  "monto_total_a_abonar":152000,
+  "cliente":{
+    "id": 15,
+    "dni":38524142,
+    "cuil_cuit":21385241422,
+    "fecha_nac": "1975/01/05",
+    "apellido":"Tune",
+    "nombre": "Otho",
+    "email":"othotn@gmail.com",
+    "profesion":"Mecánico",
+    "anio_registro":2015,
+    "enum_tipo_dni": {
+      "id": 1,
+      "descripcion": "DNI"
+    },
+    "enum_cond_iva":{
+      "id": 1,
+      "descripcion":"Responsable Inscripto"
+    },
+    "direccion":{
+      "id": 1,
+      "nombre_calle":"4 de Enero",
+      "num_calle": 2400,
+      "num_dpto": 0,
+      "localidad":{
+        "id":1,
+        "nombre_localidad":"Santa Fe",
+        "codigo_postal":3000
+      }
+    },
+    "enum_estado_civil":{
+      "id": 3,
+      "descripcion":"Casado"
+    },
+    "enum_sexo":{
+      "id":1,
+      "descripcion":"Masculino"
+    }
+  },
+  "tipo_cobertura":{
+    "id": 1,
+    "nombre": "Resp. Civil"
+  },
+  "localidad":{
+    "id": 1,
+    "nombre_localidad":"Santa Fe",
+    "codigo_postal":3000
+  },
+  "formapago":{
+    "id": 2,
+    "descripcion": "Semestral"
+  },
+  "siniestro_FC":{
+    "id":1,
+    "descripcion": "un siniestro"
+  },
+  "vehiculo":{
+    "anio_vehiculo":2006,
+    "motor":"ASDF123457",
+    "chasis":"154214FCDFG",
+    "patente":"ADF-1234",
+    "modelo":{
+      "id":3,
+      "nombre":"Mustang",
+      "marca":{
+        "id":4,
+        "nombre":"Mitsubishi"
+      }
+    },
+    "lista_medidas": [
+      {
+        "id":1,
+        "descripcion":"Alarma"
+
+      },
+      {
+        "id":2,
+        "descripcion":"Rastreo Vehicular"
+
+      },
+      {
+        "id":4,
+        "descripcion":"Garage"
+
+      }
+    ]
+  },
+  "lista_hijos":[
+    {
+      "dni":38457321,
+      "fecha_nac":"1996/02/15",
+      "estado_civil":{
+        "id":4,
+        "descripcion":"Soltero"
+      },
+      "enum_sexo":{
+        "id":1,
+        "descripcion":"Masculino"
+      }
+    },
+    {
+      "dni":38457322,
+      "fecha_nac":"1996/03/15",
+      "estado_civil":{
+        "id":4,
+        "descripcion":"Soltero"
+      },
+      "enum_sexo":{
+        "id":2,
+        "descripcion":"Femenino"
+      }
+    }
+
+  ],
+  "lista_cuotas":[
+    {
+      "id":0,
+      "num_cuota":1,
+      "fecha_vencimiento":"2020/06/03",
+      "monto":152000,
+      "pago":null,
+      "bonificacion_pago_adelantado": null,
+      "recargos":null
+
+    }
+  ]
+
+}

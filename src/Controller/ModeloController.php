@@ -6,6 +6,7 @@ namespace App\Controller;
 
 
 use App\Entity\Modelo;
+use App\Services\DAO\DoctrineFactoryDAO;
 use App\Services\DAO\ModeloDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -27,19 +28,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ModeloController extends FOSRestController
 {
 
-    //private $modeloDAO;
-    /**
-     * ModeloController constructor.
-     */
-    /*public function __construct()
-    {
-        /** @var EntityManager $em */
-        /*$em = $this->getDoctrine()->getManager();
-        $this->modeloDAO = new ModeloDAO($em);
-
-    }*/
-
-
     /**
      * Devuelve un modelo según id
      *
@@ -51,9 +39,10 @@ class ModeloController extends FOSRestController
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $modeloDAO = new ModeloDAO($em);
+        $modeloDAO = DoctrineFactoryDAO::getFactory()->getModeloDAO($em);
 
         return $modeloDAO->getObj($id);
+
     }
 
 
@@ -63,15 +52,15 @@ class ModeloController extends FOSRestController
      * @View(serializerEnableMaxDepthChecks=true)
      * @return array
      */
-
     //TODO Igual que localidad, ver si agregar lo de id marca
     public function cgetAction(){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $modeloDAO = new ModeloDAO($em);
+        $modeloDAO = DoctrineFactoryDAO::getFactory()->getModeloDAO($em);
 
         return $modeloDAO->getAllObj();
+
     }
 
 }

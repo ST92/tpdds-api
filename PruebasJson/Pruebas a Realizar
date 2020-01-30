@@ -1,0 +1,28 @@
+Pruebas a realizar por CU:
+
+	-CU1:
+
+	    -Ingresar un vehiculo con mas de 10 años. Debería mostrarse solo Responsabilidad Civil como tipo de cobertura.
+	    -
+	-CU12:
+
+	-CU17:
+
+
+	-CU18:
+
+		-Probar un nro de poliza no vigente.
+		-Probar un nro de poliza vigente.
+
+Agregar a la BD:
+
+    -Agregar clientes inactivos a la BD.
+    -Agregar una poliza por cada estado posible
+
+Dudas:
+
+    -Año es de vehiculo o de modelo? El atributo está en vehiculo.
+    -Puede ocurrir que una poliza esté en estado GENERADA (es decir, fue emitida pero no entró en vigencia) que tenga el mismo chasis, motor o patente
+     que una poliza que esta a punto de darse de alta? El enunciado solo se refiere a Poliza Vigente
+    -Consultar respecto a que hacer con los derechosDeEmision. En teoria se puede calcular despues en base a los valores para el ajuste y los historiales
+    -Consultar. Entra al if de arriba si alguno de los campos es nulo, el error salta luego de procesar toda la información (en el persist).

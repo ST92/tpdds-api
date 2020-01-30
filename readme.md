@@ -53,3 +53,8 @@ https://www.php.net/manual/es/datetime.examples-arithmetic.php
 
 #QueryBuilder
 https://www.doctrine-project.org/projects/doctrine-orm/en/2.7/reference/query-builder.html
+
+
+#Prueba de Clientes:
+   api/clientes?[apellido]=ap&[nombre]=nom...
+   

@@ -86,7 +86,7 @@ class ClienteDAO implements IClienteDAO{
                      $orderByArray[] = 'c.nombre ' . $direccion;
                      break;
                  case 'enumTipoDni.id':
-                     $orderByArray[] = 'td.id ' . $direccion;
+                     $orderByArray[] = 'td.id' . $direccion;
                      break;
              }
          }
@@ -94,7 +94,7 @@ class ClienteDAO implements IClienteDAO{
          //Crea el string para el WHERE de la consulta con los valores de filtros
          $where = '';
          if (!empty($filterArray)) {
-             $where = 'WHERE ' . implode(' AND ', $filterArray);
+             $where = 'WHERE '.implode(' AND ', $filterArray);
          }
 
         //Crea el string para el ORDER BY de la consulta.
@@ -117,7 +117,7 @@ class ClienteDAO implements IClienteDAO{
 
          $query = $this->em
              ->createQuery(
-                 "SELECT DISTINCT c,td FROM App:Cliente c $joinWithStr $where $orderByStr"
+                 "SELECT DISTINCT c FROM App:Cliente c $joinWithStr $where $orderByStr"
              )
              ->setParameters($paramsArray)
              ->setMaxResults($limit)

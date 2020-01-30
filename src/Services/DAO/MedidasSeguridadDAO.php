@@ -29,4 +29,10 @@ class MedidasSeguridadDAO implements IMedidasSeguridadDAO{
         return $this->em->getRepository(MedidasSeguridad::class)->find($id);
 
     }
+
+    public function getAllObj(){
+
+        return $this->em->getRepository(MedidasSeguridad::class)->findBy([], ['descripcion' => 'ASC']);
+
+    }
 }

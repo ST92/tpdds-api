@@ -4,7 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Provincia;
-use App\Services\DAO\ProvinciaDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -25,20 +25,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class ProvinciaController extends FOSRestController
 {
 
-    //private $provinciaDAO;
-
-    /**
-     * ProvinciaController constructor.
-     */
-   /* public function __construct()
-    {
-        /** @var EntityManager $em */
-       /* $em = $this->getDoctrine()->getManager();
-        $this->provinciaDAO = new ProvinciaDAO($em);
-
-    }*/
-
-
     /**
      * Devuelve una provincia según el id
      *
@@ -50,11 +36,11 @@ class ProvinciaController extends FOSRestController
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $provinciaDAO = new ProvinciaDAO($em);
+        $provinciaDAO = DoctrineFactoryDAO::getFactory()->getProvinciaDAO($em);
 
          return $provinciaDAO->getObj($id);
 
-     }
+    }
 
 
      /**
@@ -63,11 +49,13 @@ class ProvinciaController extends FOSRestController
       * @View(serializerEnableMaxDepthChecks=true)
       * @return array
       */
-    public function cgetAction(){
+     public function cgetAction(){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $provinciaDAO = new ProvinciaDAO($em);
+        $provinciaDAO = DoctrineFactoryDAO::getFactory()->getProvinciaDAO($em);
 
         return $provinciaDAO->getAllObj();
+
     }
 }

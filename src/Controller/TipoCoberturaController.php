@@ -5,7 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\TipoCobertura;
-use App\Services\DAO\TipoCoberturaDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -26,18 +26,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class TipoCoberturaController extends FOSRestController {
 
-    //private $tipoCobDAO;
-
-
-    /*public function __construct()
-    {
-        /** @var EntityManager $em */
-        /*
-        $em = $this->getDoctrine()->getManager();
-        $this->tipoCobDAO = new TipoCoberturaDAO($em);
-
-    }*/
-
 
     /**
      * Devuelve un tipo de cobertura según id
@@ -50,7 +38,7 @@ class TipoCoberturaController extends FOSRestController {
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $tipoCobDAO = new TipoCoberturaDAO($em);
+        $tipoCobDAO = DoctrineFactoryDAO::getFactory()->getTipoCoberturaDAO($em);
 
         return $tipoCobDAO->getObj($id);
 
@@ -67,9 +55,10 @@ class TipoCoberturaController extends FOSRestController {
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $tipoCobDAO = new TipoCoberturaDAO($em);
+        $tipoCobDAO = DoctrineFactoryDAO::getFactory()->getTipoCoberturaDAO($em);
 
         return $tipoCobDAO->getAllObj();
+
     }
 
 }

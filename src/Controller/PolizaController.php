@@ -21,20 +21,7 @@ use App\Form\PremioDescType;
 use App\Form\PolizaType;
 
 //DAO
-use App\Services\DAO\AjustesKMDAO;
-use App\Services\DAO\ClienteDAO;
 use App\Services\DAO\DoctrineFactoryDAO;
-use App\Services\DAO\EnumSexoDAO;
-use App\Services\DAO\EnumEstadoCivilDAO;
-use App\Services\DAO\EnumEstadoPolizaDAO;
-use App\Services\DAO\FactoresCDAO;
-use App\Services\DAO\EnumFormaPagoDAO;
-use App\Services\DAO\LocalidadDAO;
-use App\Services\DAO\MedidasSeguridadDAO;
-use App\Services\DAO\ModeloDAO;
-use App\Services\DAO\PolizaDAO;
-use App\Services\DAO\SiniestrosDAO;
-use App\Services\DAO\TipoCoberturaDAO;
 
 //Otros
 use App\Services\SistemaFinancieroService;
@@ -105,8 +92,6 @@ class PolizaController extends FOSRestController{
 
 
 
-
-
  //CU1. Alta de Poliza.
 
     /**
@@ -152,15 +137,18 @@ class PolizaController extends FOSRestController{
      * @param string $chasis
      * @return bool
      */
+    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene el mismo chasis
     public function getValidacionchasisAction($chasis){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
         //Estado Vigente/Activa
+
         $estado = $estadoPolizaDAO->getObj(1);
+
         $cant = $polizaDAO->findVehiculoActivo("chasis", $chasis, $estado);
 
         if($cant==0){
@@ -173,7 +161,6 @@ class PolizaController extends FOSRestController{
 
     }
 
-
     /**
      * Verifica si motor tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese motor
      *
@@ -181,12 +168,13 @@ class PolizaController extends FOSRestController{
      * @param string $motor
      * @return bool
      */
+    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene el mismo motor
     public function getValidacionmotorAction($motor){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
         //Estado Vigente/Activa
         $estado = $estadoPolizaDAO->getObj(1);
@@ -211,12 +199,13 @@ class PolizaController extends FOSRestController{
      * @param string $patente
      * @return bool
      */
+    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene la misma patente
     public function getValidacionpatenteAction($patente){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
-        $estadoPolizaDAO = new EnumEstadoPolizaDAO($em);
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
         //Estado Vigente/Activa
         $estado = $estadoPolizaDAO->getObj(1);
@@ -236,10 +225,12 @@ class PolizaController extends FOSRestController{
     /**
      * Verifica si el vehiculo tiene más de 10 años. De ser asi, solo debería mostrarse la opcion Responsabilidad Civil como tipo de cobertura
      * Retorna TRUE si tiene más de 10 años
+     *
      * @View(serializerEnableMaxDepthChecks=true)
      *
      * @param $anioVehiculo
      * @return bool
+     *
      */
     public function getValidacionaniosvehiculoAction($anioVehiculo){
 
@@ -257,6 +248,7 @@ class PolizaController extends FOSRestController{
     /**
      * Verifica que la fecha de inicio de vigencia ingresada no sea menor a la fecha siguiente a la actual y mayor a 1 mes de la fecha actual
      * Retorna TRUE si la fecha es valida
+     *
      * //TODO Si faltan menos de 24 horas para la siguiente fecha a la actual, el if no lo toma como fecha valida salvo que ponga >=0, pero aceptaría la fecha de hoy
      * @View(serializerEnableMaxDepthChecks=true)
      * @param $fechaInicio
@@ -265,18 +257,20 @@ class PolizaController extends FOSRestController{
      */
     public function getValidacionfechainicioAction($fechaInicio){
 
-        $now = new DateTime();
+        $now = new DateTime('today');
         $fecha= new DateTime($fechaInicio);
 
-        $dias = date_diff($now, $fecha);
         $dias=$now->diff($fecha);
 
-        $diferencia = (int)($dias->format('%M'));
+        //Diferencia en días
+        $diferencia = (int)($dias->format('%R%a'));
 
+        //Si la diferencia es mayor a cero, es decir, la fecha es mayor que la de hoy
         if($diferencia>0) {
 
-            return $dias->format('%y-%m-%d');
-            if((int)$dias->format('%M')<1){
+            //Si la diferencia es menor a 31, la fecha está dentro de los 30 días. Por lo que sería válida
+            if((int)$dias->format('%R%a')<31){
+
                 return true;
             }
             else{
@@ -284,8 +278,7 @@ class PolizaController extends FOSRestController{
             }
         }
 
-        //return $diferencia;
-        return $dias->format('%y-%m-%d');
+        return $diferencia;
     }
 
 
@@ -304,16 +297,15 @@ class PolizaController extends FOSRestController{
      * @throws
      */
     //TODO Consultar respecto a que hacer con los derechosDeEmision. En teoria se puede calcular despues en base a los valores para el ajuste y los historiales
-    //TODO Consultar respecto a como se representa el descuento, si es un porcentaje que despues calcula el montoTotalAAbonar o es un valor de dinero como lo es el premio
-
     //CU16 lo retorna, pero en diagrama, Poliza no tiene el atributo derechosDeEmision
     public function getCalculopremiodescAction(Request $request){
+
         //Prima = precio del seguro
         //Premio = Prima mas ajustes sobre dicha prima.
         //Descuentos = no se si es porcentaje o es una suma.
 
         $premio = 100000;
-        $descuento = 0.30; //por ahora asumo que es un porcentaje y que en base al premio se calcula aparte.
+        $descuento = 0.10;
         $derechosDeEmision=30000; //por ahora asumo que es un valor que se le suma a la prima para obtener el premio
 
         $response = new JsonResponse();
@@ -335,14 +327,14 @@ class PolizaController extends FOSRestController{
 
     /**
      * Calcula fecha fin de vigencia. Todas las polizas duran 6 meses como máximo
+     * Prueba realizada con formato de fechaInicioVigencia = YYYY-MM-DD
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param $fechaInicioVigencia
      * @return string
      * @throws
+     *
      */
-    //TODO Revisar bien los valores retornados
-
     public function getFechafinvigenciaAction($fechaInicioVigencia){
 
         $now = new DateTime($fechaInicioVigencia);
@@ -360,13 +352,16 @@ class PolizaController extends FOSRestController{
      *
      *
      * @View(serializerEnableMaxDepthChecks=true)
+     *
      * @param $montoTotal //Para calcular el monto de cada cuota
-     * @param $cant //1 si es semestral, 6 si es mensual. Todas las polizas tienen cuotas asociadas.
+     * @param $cant //1 si es semestral, 6 si es mensual. Todas las polizas tienen al menos una cuota asociada.
      * @param $fechaInicioVigencia //Para calcular las fechas de pago
+     *
+     * Retorna arreglo de cuotas, si es semestral, el arreglo tendrá solo una cuota como elemento
      * @return ArrayCollection
      * @throws
+     *
      */
-    //TODO Revisar en diagrama si existe una fecha de ultimo pago en Poliza o si solo está en las cuotas
     //TODO Problema es que solo retorna los argumentos que tienen valor. CuotaType tiene mas atributos que los que retorna este listado
     public function getCalculoCuotasAction($montoTotal, $cant, $fechaInicioVigencia){
 
@@ -377,12 +372,14 @@ class PolizaController extends FOSRestController{
 
         //Crea una entidad de tipo Cuota
         $cuota = new Cuota();
+
         if(!$cant){
             return null;
         }
         //Verifica si el pago es semestral. Si lo es, crea una sola cuota
         if($cant==1){
 
+            $cuota->setId(0);
             $cuota->setNumCuota(1);
             $cuota->setMonto($montoTotal);
 
@@ -391,6 +388,7 @@ class PolizaController extends FOSRestController{
             $fecha->modify("-1 day");
             //Retorna en este formato: 2020-01-25T00:00:00+00:00, pero si fechaInicioVigencia tiene este formato funciona
             $cuota->setFechaVencimiento($fecha);
+
             $cuotas->add($cuota);
 
             return $cuotas;
@@ -398,6 +396,7 @@ class PolizaController extends FOSRestController{
         }
 
         //Pago Mensual
+        $cuota->setId(0);
         $cuota->setNumCuota(1);
 
         //Monto de cada cuota sera el monto total dividido seis.
@@ -420,7 +419,6 @@ class PolizaController extends FOSRestController{
 
             $fecha = new DateTime(''.$fecha->format('Y-m-d'));
 
-            //TODO Ver si hacerlo por 30 dias o incrementar el mes de uno en uno
             //$fecha->modify('+30 days');
             $fecha->modify('+1 Month');
             $cuota->setFechaVencimiento($fecha);
@@ -431,6 +429,7 @@ class PolizaController extends FOSRestController{
         }
         return $cuotas;
     }
+
 
 
     /**
@@ -553,7 +552,7 @@ class PolizaController extends FOSRestController{
 
                 return $poliza;
 
-            }
+        }
 
         //Si la estructura JSON no concuerda con el Form o no es válido, retorna error.
         return $objForm;
@@ -576,7 +575,10 @@ class PolizaController extends FOSRestController{
         $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
         $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
 
+        //Obtiene el cliente para realizar la busqueda por cliente
         $c = $clienteDAO->getObj($cliente);
+
+        //Obtiene la cantidad de polizas que tiene asociado el cliente, vigente o no.
         $cantPoliza = $polizaDAO->countObj($c);
 
 
@@ -598,19 +600,19 @@ class PolizaController extends FOSRestController{
 
         /** @var EntityManager $em */
         $em=$this->getDoctrine()->getManager();
-        $polizaDAO = new PolizaDAO($em);
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+
         return $polizaDAO->getObj($id);
 
     }
 
 
 //CU12. Luego de realizar un pago se actualiza el estado de poliza
-
-
     /**
      * Debe actualizar el estado de poliza segun los pagos realizados
      * @param $id
      */
+    //TODO Implementar
     public function putAction($id){
 
 

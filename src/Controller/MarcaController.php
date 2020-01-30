@@ -3,11 +3,8 @@
 
 namespace App\Controller;
 
-
-
-
 use App\Entity\Marca;
-use App\Services\DAO\MarcaDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -28,19 +25,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
  */
 class MarcaController extends FOSRestController {
 
-    //private $marcaDAO;
-    /**
-     * MarcaController constructor.
-     */
-    /*public function __construct()
-    {
-        /** @var EntityManager $em */
-       /* $em = $this->getDoctrine()->getManager();
-        $this->marcaDAO = new MarcaDAO($em);
-
-    }*/
-
-
     /**
      * Devuelve una marca según el id
      *
@@ -48,11 +32,11 @@ class MarcaController extends FOSRestController {
      * @param int $id
      * @return mixed
      */
-    public function getAction(int $id)
-    {
+    public function getAction(int $id){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $marcaDAO = new MarcaDAO($em);
+        $marcaDAO = DoctrineFactoryDAO::getFactory()->getMarcaDAO($em);
 
         return $marcaDAO->getObj($id);
 
@@ -64,11 +48,11 @@ class MarcaController extends FOSRestController {
      * @View(serializerEnableMaxDepthChecks=true)
      * @return array
      */
-    public function cgetAction()
-    {
+    public function cgetAction(){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $marcaDAO = new MarcaDAO($em);
+        $marcaDAO = DoctrineFactoryDAO::getFactory()->getMarcaDAO($em);
 
         return $marcaDAO->getAllObj();
 

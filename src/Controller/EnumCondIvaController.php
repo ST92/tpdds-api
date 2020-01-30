@@ -5,7 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\EnumCondIva;
-use App\Services\DAO\EnumCondIvaDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -27,15 +27,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class EnumCondIvaController extends FOSRestController {
 
-    //private $enumCondIvaDAO;
-
-    /*public function __construct(){
-        /** @var EntityManager $em */
-       /* $em = $this->getDoctrine()->getManager();
-        $this->enumCondIvaDAO = new EnumCondIvaDAO($em);
-
-    }*/
-
 
     /**
      * Devuelve entidad CondicionIVA dado un Id
@@ -43,13 +34,16 @@ class EnumCondIvaController extends FOSRestController {
      * @View(serializerEnableMaxDepthChecks=true)
      * @param int $id
      * @return mixed
+     *
      */
     public function getAction(int $id){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-         $enumCondIvaDAO = new EnumCondIvaDAO($em);
+        $enumCondIvaDAO = DoctrineFactoryDAO::getFactory()->getEnumCondIvaDAO($em);
 
-         return $enumCondIvaDAO->getObj($id);
+        return $enumCondIvaDAO->getObj($id);
+
     }
 
 
@@ -63,7 +57,7 @@ class EnumCondIvaController extends FOSRestController {
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $enumCondIvaDAO = new EnumCondIvaDAO($em);
+        $enumCondIvaDAO = DoctrineFactoryDAO::getFactory()->getEnumCondIvaDAO($em);
 
         return $enumCondIvaDAO->getAllObj();
 

@@ -4,7 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\EnumEstadoCivil;
-use App\Services\DAO\EnumEstadoCivilDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -25,16 +25,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class EnumEstadoCivilController extends FOSRestController {
 
-    //private $estadoCivilDAO;
-
-
-    /*public function __construct(){
-
-        /** @var EntityManager $em */
-       /* $em = $this->getDoctrine()->getManager();
-        $this->estadoCivilDAO = new EnumEstadoCivilDAO($em);
-
-    }*/
 
     /**
      * Devuelve entidad tipo EnumEstadoCivil según un id
@@ -47,7 +37,7 @@ class EnumEstadoCivilController extends FOSRestController {
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-         $estadoCivilDAO = new EnumEstadoCivilDAO($em);
+         $estadoCivilDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoCivilDAO($em);
 
          return $estadoCivilDAO->getObj($id);
 
@@ -61,9 +51,10 @@ class EnumEstadoCivilController extends FOSRestController {
       * @return array
       */
     public function cgetAction(){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $estadoCivilDAO = new EnumEstadoCivilDAO($em);
+        $estadoCivilDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoCivilDAO($em);
 
         return $estadoCivilDAO->getAllObj();
 

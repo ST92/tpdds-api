@@ -4,7 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\Localidad;
-use App\Services\DAO\LocalidadDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use FOS\RestBundle\Controller\FOSRestController;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -25,18 +25,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class LocalidadController extends FOSRestController{
 
-    //private $localidadDAO;
-
-
-   /* public function __construct()
-    {
-        /** @var EntityManager $em */
-       /* $em = $this->getDoctrine()->getManager();
-        $this->localidadDAO = new LocalidadDAO($em);
-
-    }*/
-
-
     /**
      * Devuelve localidad dado un id
      *
@@ -48,25 +36,26 @@ class LocalidadController extends FOSRestController{
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $localidadDAO = new LocalidadDAO($em);
+        $localidadDAO = DoctrineFactoryDAO::getFactory()->getLocalidadDAO($em);
 
         return $localidadDAO->getObj($id);
-     }
+
+    }
 
 
-     /**
-      * Devuelve las localidades en orden alfabético
-      * @View(serializerEnableMaxDepthChecks=true)
-      *
-      * @return array
-      *
-      */
+    /**
+     * Devuelve las localidades en orden alfabético
+     * @View(serializerEnableMaxDepthChecks=true)
+     *
+     * @return array
+     *
+     */
     //TODO Ver si agregar o no el id de provincia
     public function cgetAction(){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $localidadDAO = new LocalidadDAO($em);
+        $localidadDAO = DoctrineFactoryDAO::getFactory()->getLocalidadDAO($em);
 
         return $localidadDAO->getAllObj();
 

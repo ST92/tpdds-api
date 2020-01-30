@@ -3,7 +3,8 @@
 
 namespace App\Controller;
 
-use App\Services\DAO\MedidasSeguridadDAO;
+
+use App\Services\DAO\DoctrineFactoryDAO;
 use FOS\RestBundle\Controller\FOSRestController;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -36,25 +37,24 @@ class MedidasSeguridadController extends FOSRestController{
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $medidaSeguridadDAO = new MedidasSeguridadDAO($em);
+        $medidaSeguridadDAO = DoctrineFactoryDAO::getFactory()->getMedidasSeguridadDAO($em);
 
         return $medidaSeguridadDAO->getObj($id);
-     }
+    }
 
 
-     /**
-      * Devuelve todas las medidas de seguridad
-      * @View(serializerEnableMaxDepthChecks=true)
-      *
-      * @return array
-      *
-      */
-    //TODO Ver si agregar o no el id de provincia
+    /**
+     * Devuelve todas las medidas de seguridad
+     * @View(serializerEnableMaxDepthChecks=true)
+     *
+     * @return array
+     *
+     */
     public function cgetAction(){
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $medidaSeguridadDAO = new MedidasSeguridadDAO($em);
+        $medidaSeguridadDAO = DoctrineFactoryDAO::getFactory()->getMedidasSeguridadDAO($em);
 
         return $medidaSeguridadDAO->getAllObj();
 

@@ -4,7 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\EnumFormaPago;
-use App\Services\DAO\EnumFormaPagoDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -25,19 +25,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class EnumFormaPagoController extends FOSRestController{
 
-    //private $formaPagoDAO;
-
-    /**
-     * EnumFormaPagoController constructor.
-     */
-    /*public function __construct(){
-
-        /** @var EntityManager $em */
-      /*  $em = $this->getDoctrine()->getManager();
-        $this->formaPagoDAO = new EnumFormaPagoDAO($em);
-
-    }*/
-
 
     /**
      * Devuelve forma de pago dado un id enviado
@@ -50,9 +37,10 @@ class EnumFormaPagoController extends FOSRestController{
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $formaPagoDAO = new EnumFormaPagoDAO($em);
+        $formaPagoDAO = DoctrineFactoryDAO::getFactory()->getEnumFormaPagoDAO($em);
 
         return $formaPagoDAO->getObj($id);
+
       }
 
       /**
@@ -63,11 +51,13 @@ class EnumFormaPagoController extends FOSRestController{
        *
        */
     public function cgetAction(){
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $formaPagoDAO = new EnumFormaPagoDAO($em);
+        $formaPagoDAO = DoctrineFactoryDAO::getFactory()->getEnumFormaPagoDAO($em);
 
         return $formaPagoDAO->getAllObj();
+
     }
 
 

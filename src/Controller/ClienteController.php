@@ -8,9 +8,7 @@ use App\EntidadesAux\BusquedaCliente;
 use App\Entity\Cliente;
 use App\Entity\EnumTipoDni;
 use App\Form\BusquedaClienteType;
-use App\Services\DAO\ClienteDAO;
 use App\Services\DAO\DoctrineFactoryDAO;
-use App\Services\DAO\EnumTipoDNIDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -70,6 +68,7 @@ class ClienteController extends FOSRestController{
      */
     //TODO La validacion de todos los valores en null se hace o en el front end, o se realiza aqui?
     //TODO Probar
+    //TODO FALTA EL CRITERIO DE BUSQUEDA ESTADO CLIENTE = ACTIVO!!
     public function cgetAction(ParamFetcherInterface $paramFetcher){
 
         //Obtiene el DAO para realizar la busqueda sobre entidades de tipo Cliente
@@ -81,6 +80,8 @@ class ClienteController extends FOSRestController{
         $offset = $paramFetcher->get('offset');
         $limit = $paramFetcher->get('limit');
         $order_by = !is_null($paramFetcher->get('order_by')) ? $paramFetcher->get('order_by') : array();
+
+        //TODO Consultar: si los filtros son nulos, deberia retornar directamente, no buscar
         $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
         $operators = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('operators') : array();
 
@@ -96,6 +97,7 @@ class ClienteController extends FOSRestController{
 
     /**
      * Retorna un cliente según el id enviado como parametro
+     * No sirve para la busqueda de cliente. Solo sirve como prueba. Salvo que filtre por clientes activos.
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param int $id

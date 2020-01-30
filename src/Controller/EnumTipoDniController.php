@@ -5,7 +5,7 @@ namespace App\Controller;
 
 
 use App\Entity\EnumTipoDni;
-use App\Services\DAO\EnumTipoDNIDAO;
+use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -26,18 +26,6 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class EnumTipoDniController extends FOSRestController
 {
 
-    //private $tipoDNIDAO;
-
-
-    /*public function __construct(){
-
-        /** @var EntityManager $em */
-        /*$em = $this->getDoctrine()->getManager();
-        $this->tipoDNIDAO = new EnumTipoDNIDAO($em);
-
-    }*/
-
-
     /**
      * Devuelve tipo de DNI segun el id
      *
@@ -49,7 +37,7 @@ class EnumTipoDniController extends FOSRestController
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $tipoDNIDAO = new EnumTipoDNIDAO($em);
+        $tipoDNIDAO = DoctrineFactoryDAO::getFactory()->getEnumTipoDNIDAO($em);
 
         return $tipoDNIDAO->getObj($id);
 
@@ -67,7 +55,7 @@ class EnumTipoDniController extends FOSRestController
 
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
-        $tipoDNIDAO = new EnumTipoDNIDAO($em);
+        $tipoDNIDAO = DoctrineFactoryDAO::getFactory()->getEnumTipoDNIDAO($em);
 
         return $tipoDNIDAO->getAllObj();
 

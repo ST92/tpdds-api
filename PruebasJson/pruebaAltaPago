@@ -1,0 +1,19 @@
+{
+
+  "id":null,
+  "monto":100000,
+  "fecha": "2020-01-29",
+  "lista_cuotas":[
+    {
+      "id":5,
+      "num_cuota":1,
+      "fecha_vencimiento":"2020/06/03",
+      "monto":152000,
+      "pago":null,
+      "bonificacion_pago_adelantado": null,
+      "recargos":null
+
+    }
+  ]
+
+}

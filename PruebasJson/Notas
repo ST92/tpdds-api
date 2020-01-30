@@ -1,0 +1,11 @@
+//Así no puede implementarse porque el $em no se crea hasta que se crea el controller. Por lo que da error.
+private $enumCondIvaDAO;
+public function __construct(){
+      /** @var EntityManager $em */
+      $em = $this->getDoctrine()->getManager();
+      $this->enumCondIvaDAO = new EnumCondIvaDAO($em);
+
+}
+
+
+

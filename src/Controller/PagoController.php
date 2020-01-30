@@ -6,7 +6,6 @@ namespace App\Controller;
 use App\Entity\Cuota;
 use App\Entity\Pago;
 use App\Form\PagoType;
-use App\Services\DAO\CuotaDAO;
 use App\Services\DAO\DoctrineFactoryDAO;
 use App\Services\SistemaFinancieroService;
 use DateTime;
