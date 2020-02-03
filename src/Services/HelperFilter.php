@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils\Filters;
+namespace App\Services;
 
 class HelperFilter
 {
@@ -30,10 +30,11 @@ class HelperFilter
     {
         $posibleOperators = ["contains", "notcontains", "startswith", "endswith", "=", "<>"];
         $operador = 'contains';
+
         if (isset($operadors[$campo]) && in_array($operadors[$campo], $posibleOperators)) {
             $operador = $operadors[$campo];
         }
-        switch ($operador) {
+        switch ($operador){
             case 'contains':
                 $filterArray[] = $alias . '.' . $campo . ' LIKE :' . $campo;
                 $paramsArray[$campo] = '%' . $value . '%';
@@ -51,7 +52,6 @@ class HelperFilter
                 $paramsArray[$campo] = '%' . $value;
                 break;
             case '=':
-
                 $filterArray[] = $alias . '.' . $campo . ' = :' . $campo;
                 $paramsArray[$campo] = $value;
                 break;

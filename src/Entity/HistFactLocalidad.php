@@ -16,17 +16,14 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
-//TODO Revisar que hacer con esto. Seguro no se implementa
-
 class HistFactLocalidad
 {
     /**
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    //TODO Ver si el NONE causa problemas
     private $id;
 
     /**
@@ -55,7 +52,7 @@ class HistFactLocalidad
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Localidad")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $localidad;
@@ -67,10 +64,11 @@ class HistFactLocalidad
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;
+
 
     /**
      * @return int

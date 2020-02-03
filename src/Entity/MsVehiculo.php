@@ -14,6 +14,7 @@ use JMS\Serializer\Annotation\Expose;
  * @ORM\Entity
  * @ExclusionPolicy("all")
  */
+//TODO Esta entidad creo que no va
 class MsVehiculo
 {
     /**

@@ -18,7 +18,7 @@ class AjustesPorKm
 {
     /**
      * @var int
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      *
@@ -33,13 +33,13 @@ class AjustesPorKm
 
     /**
      * @var int
-     * @ORM\Column(name="valor_inicial", type="integer", nullable=false)
+     * @ORM\Column(name="valor_inicial", type="bigint", nullable=false)
      */
     private $valorInicial;
 
     /**
      * @var int
-     * @ORM\Column(name="valor_final", type="integer", nullable=false)
+     * @ORM\Column(name="valor_final", type="bigint", nullable=false)
      */
     private $valorFinal;
 

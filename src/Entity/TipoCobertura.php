@@ -34,7 +34,7 @@ class TipoCobertura
 
     /**
      * @var string|null
-     * @ORM\Column(name="descripcion", type="string", length=250, nullable=true)
+     * @ORM\Column(name="descripcion", type="string", length=300, nullable=true)
      */
     private $descripcion;
 

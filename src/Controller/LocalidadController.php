@@ -48,9 +48,7 @@ class LocalidadController extends FOSRestController{
      * @View(serializerEnableMaxDepthChecks=true)
      *
      * @return array
-     *
      */
-    //TODO Ver si agregar o no el id de provincia
     public function cgetAction(){
 
         /** @var EntityManager $em */

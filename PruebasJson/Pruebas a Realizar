@@ -2,17 +2,50 @@ Pruebas a realizar por CU:
 
 	-CU1:
 
-	    -Ingresar un vehiculo con mas de 10 años. Debería mostrarse solo Responsabilidad Civil como tipo de cobertura.
-	    -
+	    -Ingresar una fecha de nacimiento para un hijo que no se encuentre entre 18 y 30 años.
+	    -Ingresar una fecha de nacimiento para un hijo que se encuentre entre 18 y 30 años.
+
+	    -Ingresar un año de vehiculo mayor a 10 años. A la hora de elegir un tipo de cobertura, debería mostrarse solo Responsabilidad Civil como tipo de cobertura.
+	    -Ingresar un año de vehiculo menor o igual a 10 años. Debería mostrarse todas los tipos de coberturas disponibles.
+
+	    -Ingresar un chasis que ya tenga poliza vigente. (Ver que responde el profesor respecto a una poliza de estado GENERADA). Muestra un mensaje de error
+	    -Lo mismo que lo anterior pero para motor y patente (si es que tiene una). Muestra un mensaje de error.
+	    -Ingresar un valor de chasis, motor y patente que sean validos.
+
+	    -Ingresar una fecha de inicio que sea menor a la fecha actual y mayor a un mes de la fecha actual. Retorna un mensaje de error. (Según lo implementado, podría estar deshabilitada las otras opciones de fechas)
+	    -Ingresar una fecha de inicio que esté dentro del rango valido.
+
+        -Cancelar en cualquier momento del CU.
+
 	-CU12:
+
+	    -Realizar la busqueda en CU18 con un nro de poliza no vigente. Debería terminar CU.
+	    -Realizar la busqueda en CU18 con un nro de poliza vigente.
+	    -Intentar volver a la busqueda en CU18 luego de que la poliza anterior haya sido mostrada.
+
+	    -Seleccionar cuotas que desea abonar incluyendo una cuota que no sea la primera pendiente a abonar. Debe mostrar error.
+	    -Seleccionar cuotas de forma correcta.
+	    -Cambiar las cuotas que se desea abonar, poniendo menos cuotas que el paso anterior. Recalcula los montos, etc.
+
+	    -Cancelar en cualquier momento del CU.
 
 	-CU17:
 
+        -Ingresar la busqueda de nombre con un '%' entre medio o al comienzo. Debería mostrarse un error. Validacion de caracter % se realiza en el frontend. Si viene dentro del valor de un campo string, entonces la consulta no retorna lo que debe retornar
+        -Probar con dos filtros a la vez. (segun como se vaya a implementar, creo que este no es necesario)
+        -Probar con el nombre de un cliente que sea igual a otro pero que tenga un segundo nombre. Debería retornar ambos.
+        -Probar buscar sobre un cliente inactivo. No debería retornar nada. Volvería al paso anterior de busqueda.
+
+        -Cancelar en cualquier momento. Deberia terminar el CU.
 
 	-CU18:
 
-		-Probar un nro de poliza no vigente.
-		-Probar un nro de poliza vigente.
+		-Probar un nro de poliza no vigente. Debería mostrarse los datos de dicha poliza en CU18, pero se valida en el CU12 su no vigencia, retornando un error en el CU12
+		-Probar un nro de poliza vigente. Debería mostrarse en CU18, y en CU12 debería permitir el pago.
+		-Probar un nro de poliza con estado Generada.
+		-Probar un nro de poliza que no existe. Debería retornar a la pantalla de busqueda.
+
+        -Cancelar en cualquier momento. Debería terminar el CU.
 
 Agregar a la BD:
 
@@ -21,8 +54,4 @@ Agregar a la BD:
 
 Dudas:
 
-    -Año es de vehiculo o de modelo? El atributo está en vehiculo.
-    -Puede ocurrir que una poliza esté en estado GENERADA (es decir, fue emitida pero no entró en vigencia) que tenga el mismo chasis, motor o patente
-     que una poliza que esta a punto de darse de alta? El enunciado solo se refiere a Poliza Vigente
     -Consultar respecto a que hacer con los derechosDeEmision. En teoria se puede calcular despues en base a los valores para el ajuste y los historiales
-    -Consultar. Entra al if de arriba si alguno de los campos es nulo, el error salta luego de procesar toda la información (en el persist).

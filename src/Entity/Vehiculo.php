@@ -48,7 +48,7 @@ class Vehiculo
 
     /**
      * @var string
-     * @ORM\Column(name="patente", type="string", length=20, nullable=true)
+     * @ORM\Column(name="patente", type="string", length=30, nullable=true)
      * @Expose
      */
     private $patente;
@@ -57,13 +57,14 @@ class Vehiculo
      * @var Modelo
      * @ORM\ManyToOne(targetEntity="Modelo", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="modelo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="modelo_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
     private $modelo;
 
-    //TODO Revisar notacion!!!
+    //Relación n a n
+
     /**
      * @ORM\ManyToMany(targetEntity="MedidasSeguridad", cascade={"persist", "remove"})
      * @ORM\JoinTable(name="vehiculo_ms_vehiculo",joinColumns={@ORM\JoinColumn(name="vehiculo_id", referencedColumnName = "id")}, inverseJoinColumns={@ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName = "id")})

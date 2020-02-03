@@ -17,16 +17,15 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
-//TODO Seguro no se implementa
 class HistorialFactoresCaract
 {
     /**
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    //TODO Este NONE puede generar problemas
+
     private $id;
 
     /**
@@ -67,7 +66,7 @@ class HistorialFactoresCaract
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="FactoresCaracteristicas")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="caract_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="caract_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $factoresCaracteristicas;
@@ -78,7 +77,7 @@ class HistorialFactoresCaract
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

@@ -50,8 +50,9 @@ class Localidad
      * @var Provincia
      * @ORM\ManyToOne(targetEntity="Provincia")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="provincia_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="provincia_id", referencedColumnName="id", nullable=false)
      * })
+     * @Expose
      */
     private $provincia;
 

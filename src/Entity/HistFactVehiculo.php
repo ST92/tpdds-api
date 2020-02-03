@@ -23,7 +23,7 @@ class HistFactVehiculo
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -52,7 +52,7 @@ class HistFactVehiculo
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Modelo")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="modelo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="modelo_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $modelo;
@@ -64,7 +64,7 @@ class HistFactVehiculo
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

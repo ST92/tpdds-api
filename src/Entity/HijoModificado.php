@@ -15,7 +15,6 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
-//TODO Ver que se hará con esto. En teoría no lo vamos a usar.
 class HijoModificado
 {
     /**
@@ -28,7 +27,7 @@ class HijoModificado
 
     /**
      * @var int
-     * @ORM\Column(name="dni", type="integer", nullable=false)
+     * @ORM\Column(name="dni", type="bigint", nullable=false)
      */
     private $dni;
 
@@ -42,7 +41,7 @@ class HijoModificado
      * @var EnumEstadoCivil
      * @ORM\ManyToOne(targetEntity="EnumEstadoCivil")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $enumEstadoCivil;
@@ -52,7 +51,7 @@ class HijoModificado
      *
      * @ORM\ManyToOne(targetEntity="EnumSexo")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $enumSexo;
@@ -62,7 +61,7 @@ class HijoModificado
      *
      * @ORM\ManyToOne(targetEntity="PolizaModificada")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="nro_poliza_modif_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="nro_poliza_modif_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $polizaModificada;

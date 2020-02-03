@@ -1,15 +1,13 @@
 <?php
 
-
 namespace App\Form;
 
-
-use App\Entity\Modelo;
+use App\Entity\Provincia;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ModeloType extends AbstractType
+class ProvinciaType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -17,16 +15,17 @@ class ModeloType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+
         $builder
             ->add('id')
-            ->add('nombre')
-            ->add($builder->create('marca', MarcaType::class, ['em' => $options['em']]));
+            ->add('nombre');
+
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Modelo::class,
+            'data_class' => Provincia::class,
             'csrf_protection' => false,
             'allow_extra_fields' => true
         ]);

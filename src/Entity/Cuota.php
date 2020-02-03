@@ -19,7 +19,7 @@ class Cuota{
 
     /**
      * @var int
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Expose
@@ -28,7 +28,7 @@ class Cuota{
 
     /**
      * @var int
-     * @ORM\Column(name="num_cuota", type="integer", nullable=false)
+     * @ORM\Column(name="num_cuota", type="bigint", nullable=false)
      * @Expose
      */
     private $numCuota;
@@ -69,7 +69,7 @@ class Cuota{
      * @var Pago
      * @ORM\ManyToOne(targetEntity="Pago",  inversedBy = "listaCuotas", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="pago_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="pago_id", referencedColumnName="id",  nullable=true)
      * })
      * @Expose
      */
@@ -79,7 +79,7 @@ class Cuota{
      * @var Poliza
      * @ORM\ManyToOne(targetEntity="Poliza", inversedBy = "listaCuotas", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza")
+     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza", nullable=false)
      * })
      */
     private $poliza;

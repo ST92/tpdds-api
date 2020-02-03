@@ -7,7 +7,7 @@ namespace App\Services\DAO;
 use App\Entity\Cliente;
 use App\Entity\Cuota;
 use App\Interfaces\IDAO\IClienteDAO;
-use App\Utils\Filters\HelperFilter;
+use App\Services\HelperFilter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -43,6 +43,7 @@ class ClienteDAO implements IClienteDAO{
      *
      * @return object[]
      */
+    //TODO No está funcionando la busqueda por EstadoCliente <> 3
      public function getAllObj($filters, $operators, $order_by, $limit, $offset){
 
          // armo los filtros
@@ -66,6 +67,10 @@ class ClienteDAO implements IClienteDAO{
                      $joinWithArray[] = 'JOIN c.enumTipoDni td ';
                      HelperFilter::makeId('td', 'id', $valor, $operators, $filterArray, $paramsArray);
                      break;
+                 case 'estadoCliente.descripcion':
+                     $joinWithArray[] = 'JOIN c.enumEstadoCliente ec ';
+                     HelperFilter::makeString('ec', 'descripcion', $valor, $operators, $filterArray, $paramsArray);
+                     break;
              }
          }
 
@@ -87,6 +92,9 @@ class ClienteDAO implements IClienteDAO{
                      break;
                  case 'enumTipoDni.id':
                      $orderByArray[] = 'td.id' . $direccion;
+                     break;
+                 case 'enumEstadoCliente.descripcion':
+                     $orderByArray[] = 'ec.descripcion' . $direccion;
                      break;
              }
          }
@@ -128,6 +136,15 @@ class ClienteDAO implements IClienteDAO{
      }
 
 
+    /**
+     * @param Cliente $cliente
+     */
+    public function save($cliente){
+
+         $this->em->persist($cliente);
+         $this->em->flush();
+
+    }
 
 
 

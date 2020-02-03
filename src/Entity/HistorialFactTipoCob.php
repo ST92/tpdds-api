@@ -24,7 +24,7 @@ class HistorialFactTipoCob
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -52,7 +52,7 @@ class HistorialFactTipoCob
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="TipoCobertura")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cobertura_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="cobertura_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $tipoCobertura;
@@ -64,7 +64,7 @@ class HistorialFactTipoCob
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

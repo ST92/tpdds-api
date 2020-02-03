@@ -18,7 +18,7 @@ class Direccion
 {
     /**
      * @var int
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Expose
@@ -27,14 +27,14 @@ class Direccion
 
     /**
      * @var string
-     * @ORM\Column(name="nombre_calle", type="string", length=150, nullable=false)
+     * @ORM\Column(name="nombre_calle", type="string", length=200, nullable=false)
      * @Expose
      */
     private $nombreCalle;
 
     /**
      * @var int
-     * @ORM\Column(name="num_calle", type="integer", nullable=false)
+     * @ORM\Column(name="num_calle", type="bigint", nullable=false)
      * @Expose
      */
     private $numCalle;
@@ -50,7 +50,7 @@ class Direccion
      * @var Localidad
      * @ORM\ManyToOne(targetEntity="Localidad", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */

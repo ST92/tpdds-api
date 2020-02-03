@@ -29,7 +29,7 @@ class MedidasSeguridadModificadas
      *
      * @ORM\ManyToOne(targetEntity="MedidasSeguridad")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $medidasSeguridad;
@@ -39,7 +39,7 @@ class MedidasSeguridadModificadas
      *
      * @ORM\ManyToOne(targetEntity="PolizaModificada")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="polizaMod_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="polizaMod_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $polizaMod;

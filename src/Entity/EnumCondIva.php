@@ -18,7 +18,7 @@ class EnumCondIva
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      * @Expose
@@ -27,7 +27,7 @@ class EnumCondIva
 
     /**
      * @var string
-     * @ORM\Column(name="descripcion", type="string", length=200, nullable=false)
+     * @ORM\Column(name="descripcion", type="string", length=100, nullable=false)
      * @Expose
      */
     private $descripcion;

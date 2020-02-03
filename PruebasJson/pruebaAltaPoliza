@@ -9,7 +9,7 @@
   "ultimo_dia_pago":"2020/06/03",
   "monto_total_a_abonar":152000,
   "cliente":{
-    "id": 15,
+    "id": 1000000015,
     "dni":38524142,
     "cuil_cuit":21385241422,
     "fecha_nac": "1975/01/05",
@@ -34,7 +34,11 @@
       "localidad":{
         "id":1,
         "nombre_localidad":"Santa Fe",
-        "codigo_postal":3000
+        "codigo_postal":3000,
+        "provincia": {
+          "id": 0,
+          "nombre": ""
+        }
       }
     },
     "enum_estado_civil":{
@@ -53,7 +57,11 @@
   "localidad":{
     "id": 1,
     "nombre_localidad":"Santa Fe",
-    "codigo_postal":3000
+    "codigo_postal":3000,
+    "provincia": {
+      "id": 0,
+      "nombre": ""
+    }
   },
   "formapago":{
     "id": 2,

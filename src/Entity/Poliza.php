@@ -28,7 +28,6 @@ class Poliza
      * @ORM\Id
      * @Expose
      */
-    // @ORM\GeneratedValue(strategy="IDENTITY")
     private $nroPoliza;
 
     /**
@@ -91,7 +90,7 @@ class Poliza
      * @var AjustesPorKm
      * @ORM\ManyToOne(targetEntity="AjustesPorKm", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ajustesKm_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="ajustesKm_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $ajusteskm;
@@ -100,7 +99,7 @@ class Poliza
      * @var FactoresCaracteristicas
      * @ORM\ManyToOne(targetEntity="FactoresCaracteristicas", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="caract_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="caract_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $factores;
@@ -109,7 +108,7 @@ class Poliza
      * @var Cliente
      * @ORM\ManyToOne(targetEntity="Cliente", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cliente_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="cliente_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -119,7 +118,7 @@ class Poliza
      * @var TipoCobertura
      * @ORM\ManyToOne(targetEntity="TipoCobertura", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="tipoCobertura_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="tipoCobertura_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -129,7 +128,7 @@ class Poliza
      * @var Localidad
      * @ORM\ManyToOne(targetEntity="Localidad", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -139,7 +138,7 @@ class Poliza
      * @var EnumEstadoPoliza
      * @ORM\ManyToOne(targetEntity="EnumEstadoPoliza", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumEstadoPoliza_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumEstadoPoliza_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $estadoPoliza;
@@ -148,17 +147,18 @@ class Poliza
      * @var EnumFormaPago
      * @ORM\ManyToOne(targetEntity="EnumFormaPago", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumFormaPago_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumFormaPago_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
     private $formapago;
 
+    //Poliza anterior a ésta poliza. La primera puede ser nula, por eso el nullable=true
     /**
      * @var Poliza
      * @ORM\ManyToOne(targetEntity="Poliza", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza")
+     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza", nullable=true)
      * })
      */
     private $idPoliza;
@@ -167,7 +167,7 @@ class Poliza
      * @var SiniestrosFc
      * @ORM\ManyToOne(targetEntity="SiniestrosFc", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="siniestrosFc_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="siniestrosFc_id", referencedColumnName="id", nullable=false)
      * })
      *  @Expose
      */
@@ -177,12 +177,13 @@ class Poliza
      * @var Vehiculo
      * @ORM\OneToOne(targetEntity="Vehiculo", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="vehiculo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="vehiculo_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
     private $vehiculo;
 
+    //Relación bidireccional
     /**
      * @ORM\OneToMany(targetEntity="Hijo", mappedBy="poliza", cascade={"persist", "remove"})
      * @var ArrayCollection
@@ -427,7 +428,7 @@ class Poliza
     /**
      * @param EnumEstadoPoliza $estadoPoliza
      */
-    public function setEstadopoliza($estadoPoliza){
+    public function setEstadoPoliza($estadoPoliza){
         $this->estadoPoliza = $estadoPoliza;
     }
 
@@ -448,7 +449,7 @@ class Poliza
     }
 
     /**
-     * @return mixed
+     * @return Poliza
      */
     public function getIdPoliza()
     {
@@ -458,7 +459,7 @@ class Poliza
     /**
      * @param Poliza $idPoliza
      */
-    public function setIdPoliza($idPoliza): void
+    public function setIdPoliza($idPoliza)
     {
         $this->idPoliza = $idPoliza;
     }

@@ -31,7 +31,8 @@ class LocalidadType extends AbstractType
         $builder
             ->add('id')
             ->add('nombre_localidad')
-            ->add('codigo_postal');
+            ->add('codigo_postal')
+            ->add($builder->create('provincia', ProvinciaType::class, ['em' => $options['em']]));
     }
 
     public function configureOptions(OptionsResolver $resolver)

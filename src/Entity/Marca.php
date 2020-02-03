@@ -15,6 +15,7 @@ use JMS\Serializer\Annotation\Expose;
  * @ORM\Entity
  * @ExclusionPolicy("all")
  */
+
 class Marca{
     /**
      * @var int

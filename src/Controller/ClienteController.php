@@ -4,10 +4,8 @@
 namespace App\Controller;
 
 
-use App\EntidadesAux\BusquedaCliente;
 use App\Entity\Cliente;
-use App\Entity\EnumTipoDni;
-use App\Form\BusquedaClienteType;
+use App\Entity\Poliza;
 use App\Services\DAO\DoctrineFactoryDAO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -39,7 +37,87 @@ class ClienteController extends FOSRestController{
 //CU1: Actualización de estado de cliente
 
     //TODO Implementarlo luego de consultar
-    public function getActualizarestadoclienteAction($id){
+    //Los unicos estados activos son normal o plata
+    /**
+     * @param Poliza $poliza
+     * @return
+     */
+    public function getActualizarestadoclienteAction($poliza){
+
+        //DAO
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
+        $estadoClienteDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoClienteDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
+
+        //Revisa la cantidad de polizas del cliente.
+        // Si la unica poliza asociada fue la dada de alta recien (la referencia a poliza anterior es nula, quiere decir que es la primera asociada).
+        // El cliente pasa a estado normal.
+        if(is_null($poliza->getIdPoliza())){
+
+            //Busca estado Normal en la BD y se lo agrega al cliente.
+            $poliza->getCliente()->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+            //Almacena los cambios realizados
+            $clienteDAO->save($poliza->getCliente());
+
+            return new Response();
+        }
+
+        //Buscar polizas que estén vigentes. Si retorna 0, el cliente pasa a estado Normal
+
+        //Se podría asumir que la ultima poliza, es decir, la anterior a esta, si no está vigente entonces las otras seguro no lo estarían.
+        //Por el tema de los calculos de fecha inicio o fin de vigencia
+        /*if($poliza->getIdPoliza()->getEstadoPoliza()->getId() != 1){
+
+            $poliza->getCliente()->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+            //Almacena los cambios realizados
+            $clienteDAO->save($poliza->getCliente());
+
+            return new Response();
+        }*/
+
+        //De todas formas implemento el conteo por las dudas.
+        //Estado de poliza de id 1 es estado Vigente
+        $estado = $estadoPolizaDAO->getObj(1);
+        $cantPolizaVig = $polizaDAO->countPolizaPorEstado($poliza->getCliente(), $estado);
+
+        if($cantPolizaVig==0){
+
+            //Busca estado Normal en la BD y se lo agrega al cliente.
+            $poliza->getCliente()->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+            //Almacena los cambios realizados
+            $clienteDAO->save($poliza->getCliente());
+
+            return new Response();
+
+        }
+
+        //"no estuvo activo ininterrumpido": si, por ejemplo, contrata una poliza por año, se considera que esta inactivo desde el mes 7 al 12.
+        //o sea, una poliza por año cuenta como activo interrumpido
+
+        //Si posee siniestros en el ultimo año (las ultimas dos polizas asociadas al cliente)
+            //Busco las polizas con fecha de inicio de vigencia dentro de un año.
+            //Las agrego a una lista
+            //Recorro la lista y veo si hay siniestros. Si hay una poliza en esa lista que tenga siniestros, pasa a normal y termina
+            //normal
+
+        //Cliente no posee siniestros en el ultimo año (supera el recorrido poliza por poliza)
+        //Si posee una cuota impaga
+        //normal
+        //Cliente no posee cuotas impagas
+        //Cliente activo en los ultimos tres años de forma ininterrumpida
+        //Dadas estas tres condiciones, con un AND, el estado pasa a ser Plata
+        //Plata
+        //No ha sido un cliente activo ininterrumpido al menos los dos ultimos años.
+        //Dadas estas tres condiciones, con un OR, si se cumple alguna pasa a estado Normal.
+        //Normal
+
+        return new Response();
+
 
     }
 
@@ -66,9 +144,10 @@ class ClienteController extends FOSRestController{
      * @throws
      *
      */
-    //TODO La validacion de todos los valores en null se hace o en el front end, o se realiza aqui?
-    //TODO Probar
-    //TODO FALTA EL CRITERIO DE BUSQUEDA ESTADO CLIENTE = ACTIVO!!
+    //TODO Al agregar un filtro mas a la URL, el = deja de actuar como el startswith
+    // No funciona para el criterio de busqueda "Estado cliente id distinto de 3 o descripcion distinta a Inactivo
+    // EL CRITERIO DE BUSQUEDA ESTADO CLIENTE SIEMPRE ES ACTIVO (id <> 3)
+
     public function cgetAction(ParamFetcherInterface $paramFetcher){
 
         //Obtiene el DAO para realizar la busqueda sobre entidades de tipo Cliente
@@ -80,19 +159,17 @@ class ClienteController extends FOSRestController{
         $offset = $paramFetcher->get('offset');
         $limit = $paramFetcher->get('limit');
         $order_by = !is_null($paramFetcher->get('order_by')) ? $paramFetcher->get('order_by') : array();
-
-        //TODO Consultar: si los filtros son nulos, deberia retornar directamente, no buscar
         $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
         $operators = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('operators') : array();
 
         //Retorna los resultados obtenidos
         return [
-            'items' => $clienteDAO->getAllObj($filters, $operators, $order_by, $limit, $offset)
+            'items' => $clienteDAO->getAllObj($filters, $operators, $order_by, $limit, $offset),
+            'filters'=>$filters,
+            'operators'=>$operators
         ];
 
     }
-
-
 
 
     /**
@@ -111,6 +188,26 @@ class ClienteController extends FOSRestController{
         $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
 
         return $clienteDAO->getObj($id);
+
+    }
+
+
+    /**
+     * Este se supone que retorna un valor fijo para los siniestros del conductor. En este caso retornará una entidad de tipo SiniestrosFC "fija"
+     * simulando la interaccion con el subsistema de de siniestros
+     *
+     * @View(serializerEnableMaxDepthChecks=true)
+     * @param $dni
+     * @return mixed
+     */
+    public function getSiniestrosconductorAction($dni){
+
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+
+        $id = rand(1,4);
+
+        return DoctrineFactoryDAO::getFactory()->getSiniestrosDAO($em)->getObj($id);
 
     }
 

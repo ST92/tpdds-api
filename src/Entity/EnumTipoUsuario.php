@@ -27,7 +27,7 @@ class EnumTipoUsuario{
 
     /**
      * @var string
-     * @ORM\Column(name="descripcion", type="string", length=150, nullable=false)
+     * @ORM\Column(name="descripcion", type="string", length=100, nullable=false)
      * @Expose
      */
     private $descripcion;

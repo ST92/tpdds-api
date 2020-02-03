@@ -43,7 +43,7 @@ class Modelo
      *
      * @ORM\ManyToOne(targetEntity="Marca", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="marca_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="marca_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */

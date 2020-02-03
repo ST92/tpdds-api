@@ -41,7 +41,7 @@ class Usuario
      *
      * @ORM\ManyToOne(targetEntity="EnumTipoUsuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumTipoUsuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumTipoUsuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $enumTipoUsuario;

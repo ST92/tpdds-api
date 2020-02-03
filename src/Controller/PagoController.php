@@ -86,7 +86,7 @@ class PagoController extends FOSRestController{
      *
      * El monto actualizado se calcula como monto + recargosPorMora - bonificacionPagoAdelantado
      *
-     * No se guarda en la cuota, se deberia calcular. TODO Consultar esto!
+     * No se guarda en la cuota, se deberia calcular. Esto se calcula en el frontend antes de mostrar los montos actualizados
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param
@@ -196,8 +196,7 @@ class PagoController extends FOSRestController{
      *
      * @View(serializerEnableMaxDepthChecks=true)
      */
-    //TODO Si queda tiempo, agregar el usuario que realizó la operación a Pago. De todas formas, no era necesario
-    //Si no anda, seguramente es a causa de PagoType y el argumento lista_cuotas
+
     public function postAction(Request $request){
 
         /** @var EntityManager $em */

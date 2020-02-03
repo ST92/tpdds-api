@@ -22,7 +22,7 @@ class HistorialSiniestrosFc
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -57,7 +57,7 @@ class HistorialSiniestrosFc
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="SiniestrosFc")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="siniestros_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="siniestros_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $siniestrosFC;
@@ -69,7 +69,7 @@ class HistorialSiniestrosFc
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

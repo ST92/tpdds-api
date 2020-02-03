@@ -17,14 +17,13 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
-//TODO Seguro no se implementa
 class HistorialFactAjustesPorKm
 {
     /**
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -64,7 +63,7 @@ class HistorialFactAjustesPorKm
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="AjustesPorKm")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="ajusteskm_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="ajusteskm_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $ajustesKm;
@@ -76,7 +75,7 @@ class HistorialFactAjustesPorKm
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

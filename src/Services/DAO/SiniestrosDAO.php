@@ -33,4 +33,14 @@
 
         }
 
+        /**
+         * @return object[]
+         */
+        public function getAllObj(){
+
+            //Es nombre del atributo en Entity, no de BD
+            return $this->em->getRepository(SiniestrosFc::class)->findBy([], array('descripcion' => 'ASC'));
+
+        }
+
     }

@@ -41,7 +41,7 @@ class LocalidadDAO implements ILocalidadDAO {
     public function getAllObj(){
 
         //Es nombre del atributo en Entity, no de BD
-        return $this->em->getRepository(Localidad::class)->findBy([], ['nombreLocalidad' => 'ASC']);
+        return $this->em->getRepository(Localidad::class)->findBy([],['nombreLocalidad' => 'ASC']);
 
     }
 

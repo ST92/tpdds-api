@@ -28,7 +28,7 @@ class Cliente
 
     /**
      * @var int
-     * @ORM\Column(name="dni", type="integer", nullable=false)
+     * @ORM\Column(name="dni", type="bigint", nullable=false)
      * @Expose
      */
     private $dni;
@@ -51,35 +51,28 @@ class Cliente
 
     /**
      * @var string
-     * @ORM\Column(name="apellido", type="string", length=150, nullable=false)
+     * @ORM\Column(name="apellido", type="string", length=200, nullable=false)
      * @Expose
      */
     private $apellido;
 
     /**
      * @var string
-     * @ORM\Column(name="nombre", type="string", length=150, nullable=false)
+     * @ORM\Column(name="nombre", type="string", length=200, nullable=false)
      * @Expose
      */
     private $nombre;
 
-    //TODO REVISAR!!!!
-    /**
-     * @var int
-     * @ORM\Column(name="cantidad_siniestros", type="integer", nullable=false)
-     */
-    private $cantidadSiniestros;
-
     /**
      * @var string
-     * @ORM\Column(name="email", type="string", length=150, nullable=false)
+     * @ORM\Column(name="email", type="string", length=200, nullable=false)
      * @Expose
      */
     private $email;
 
     /**
      * @var string
-     * @ORM\Column(name="profesion", type="string", length=150, nullable=false)
+     * @ORM\Column(name="profesion", type="string", length=200, nullable=false)
      * @Expose
      */
     private $profesion;
@@ -95,7 +88,7 @@ class Cliente
      * @var EnumTipoDni
      * @ORM\ManyToOne(targetEntity="EnumTipoDni", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumTipoDni_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumTipoDni_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -106,7 +99,7 @@ class Cliente
      *
      * @ORM\ManyToOne(targetEntity="EnumCondIva", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumCondIva_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumCondIva_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -116,7 +109,7 @@ class Cliente
      * @var Direccion
      * @ORM\ManyToOne(targetEntity="Direccion", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="direccion_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="direccion_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -126,7 +119,7 @@ class Cliente
      * @var EnumEstadoCivil
      * @ORM\ManyToOne(targetEntity="EnumEstadoCivil", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -136,7 +129,7 @@ class Cliente
      * @var EnumEstadoCliente
      * @ORM\ManyToOne(targetEntity="EnumEstadoCliente", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumEstadoCliente_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumEstadoCliente_id", referencedColumnName="id", nullable=false)
      * })
      *
      */
@@ -146,7 +139,7 @@ class Cliente
      * @var EnumSexo
      * @ORM\ManyToOne(targetEntity="EnumSexo", cascade={"persist"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -362,7 +355,7 @@ class Cliente
     /**
      * @param EnumEstadoCliente $idEnumestadocliente
      */
-    public function setEnumestadocliente($idEnumestadocliente){
+    public function setEnumEstadocliente($idEnumestadocliente){
         $this->enumEstadoCliente = $idEnumestadocliente;
     }
 

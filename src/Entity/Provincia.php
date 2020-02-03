@@ -30,7 +30,7 @@ class Provincia
      * @ORM\Column(name="nombre_provincia", type="string", length=150, nullable=false)
      * @Expose
      */
-    private $nombreProvincia;
+    private $nombre;
 
 
 
@@ -52,15 +52,15 @@ class Provincia
     /**
      * @return string
      */
-    public function getNombreProvincia(){
-        return $this->nombreProvincia;
+    public function getNombre(){
+        return $this->nombre;
     }
 
     /**
      * @param string $nombreProvincia
      */
-    public function setNombreProvincia(string $nombreProvincia){
-        $this->nombreProvincia = $nombreProvincia;
+    public function setNombre(string $nombreProvincia){
+        $this->nombre = $nombreProvincia;
     }
 
 

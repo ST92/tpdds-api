@@ -25,7 +25,7 @@ class Hijo
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="bigint", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
@@ -33,7 +33,7 @@ class Hijo
 
     /**
      * @var int
-     * @ORM\Column(name="dni", type="integer", nullable=false)
+     * @ORM\Column(name="dni", type="bigint", nullable=false)
      * @Expose
      */
     private $dni;
@@ -49,7 +49,7 @@ class Hijo
      * @var EnumEstadoCivil
      * @ORM\ManyToOne(targetEntity="EnumEstadoCivil", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumEstadoCivil_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -60,7 +60,7 @@ class Hijo
      *
      * @ORM\ManyToOne(targetEntity="EnumSexo", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="enumSexo_id", referencedColumnName="id", nullable=false)
      * })
      * @Expose
      */
@@ -70,7 +70,7 @@ class Hijo
      * @var Poliza
      * @ORM\ManyToOne(targetEntity="Poliza", inversedBy="listaHijos", cascade={"persist", "remove"})
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza")
+     *   @ORM\JoinColumn(name="poliza_id", referencedColumnName="nro_poliza", nullable=false)
      * })
      */
     private $poliza;

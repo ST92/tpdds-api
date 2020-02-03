@@ -16,14 +16,13 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
-//TODO Capaz no se implemente
 class HistFactMedSeg
 {
     /**
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
@@ -59,7 +58,7 @@ class HistFactMedSeg
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="MedidasSeguridad")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $medidaSeguridad;
@@ -71,7 +70,7 @@ class HistFactMedSeg
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $usuario;

@@ -38,6 +38,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 use phpDocumentor\Reflection\Types\Mixed_;
+use PhpParser\Comment\Doc;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,8 +51,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-
-
+use Symfony\Component\Validator\Constraints\Date;
 
 
 /**
@@ -249,7 +249,6 @@ class PolizaController extends FOSRestController{
      * Verifica que la fecha de inicio de vigencia ingresada no sea menor a la fecha siguiente a la actual y mayor a 1 mes de la fecha actual
      * Retorna TRUE si la fecha es valida
      *
-     * //TODO Si faltan menos de 24 horas para la siguiente fecha a la actual, el if no lo toma como fecha valida salvo que ponga >=0, pero aceptaría la fecha de hoy
      * @View(serializerEnableMaxDepthChecks=true)
      * @param $fechaInicio
      * @return
@@ -296,8 +295,7 @@ class PolizaController extends FOSRestController{
      * @return mixed
      * @throws
      */
-    //TODO Consultar respecto a que hacer con los derechosDeEmision. En teoria se puede calcular despues en base a los valores para el ajuste y los historiales
-    //CU16 lo retorna, pero en diagrama, Poliza no tiene el atributo derechosDeEmision
+    //En el diagrama de clases, los derechos de emision se almacenan en los factores de caracteristicas. Si bien, no sabemos si es correcto o no, el diagrama fue validado con dicho atributo
     public function getCalculopremiodescAction(Request $request){
 
         //Prima = precio del seguro
@@ -315,13 +313,6 @@ class PolizaController extends FOSRestController{
 
     }
 
-    /**
-     * Se encarga de calcular el monto total a abonar dado el premio y los descuentos retornados por el cu16
-     */
-    //TODO Ver si es necesario. Basicamente es operación bastante sencilla. Considerar realizarlo en el metodo anterior
-    public function getMontototalAction(){
-
-    }
 
 //CU1. Alta Poliza
 
@@ -358,12 +349,10 @@ class PolizaController extends FOSRestController{
      * @param $fechaInicioVigencia //Para calcular las fechas de pago
      *
      * Retorna arreglo de cuotas, si es semestral, el arreglo tendrá solo una cuota como elemento
-     * @return ArrayCollection
+     * @return ArrayCollection|null
      * @throws
-     *
      */
-    //TODO Problema es que solo retorna los argumentos que tienen valor. CuotaType tiene mas atributos que los que retorna este listado
-    public function getCalculoCuotasAction($montoTotal, $cant, $fechaInicioVigencia){
+      public function getCalculoCuotasAction($montoTotal, $cant, $fechaInicioVigencia){
 
         //Arranca en 1 el numero de cuota porque la BD actua raro con el número 0
         $i=2;
@@ -388,10 +377,17 @@ class PolizaController extends FOSRestController{
             $fecha->modify("-1 day");
             //Retorna en este formato: 2020-01-25T00:00:00+00:00, pero si fechaInicioVigencia tiene este formato funciona
             $cuota->setFechaVencimiento($fecha);
+            $cuota->setRecargos(0);
+            $cuota->setBonificacionPagoAdelantado(0);
 
             $cuotas->add($cuota);
 
             return $cuotas;
+
+            /*$response = new JsonResponse();
+            $response->setData(['cuotas' => $cuotas]);
+
+            return $response;*/
 
         }
 
@@ -405,6 +401,9 @@ class PolizaController extends FOSRestController{
         $fecha = new DateTime($fechaInicioVigencia);
         $fecha->modify("-1 day");
         $cuota->setFechaVencimiento($fecha);
+        $cuota->setRecargos(0);
+        $cuota->setBonificacionPagoAdelantado(0);
+
         $cuotas->add($cuota);
 
         //Crea con fecha actual
@@ -422,12 +421,19 @@ class PolizaController extends FOSRestController{
             //$fecha->modify('+30 days');
             $fecha->modify('+1 Month');
             $cuota->setFechaVencimiento($fecha);
+            $cuota->setRecargos(0);
+            $cuota->setBonificacionPagoAdelantado(0);
             $cuotas->add($cuota);
 
             $i++;
 
         }
         return $cuotas;
+        /*$response = new JsonResponse();
+        $response->setData(['cuotas' => $cuotas]);
+
+        return $response;*/
+
     }
 
 
@@ -440,6 +446,7 @@ class PolizaController extends FOSRestController{
      * @return null
      * @throws
      */
+    //TODO Falta implementar si la poliza llega a nro 100. 1 tiene una referencia a la 99?. Como continua despues?
     public function postAction(Request $request){
 
         /** @var EntityManager $em */
@@ -467,8 +474,6 @@ class PolizaController extends FOSRestController{
 
         if ($objForm->isSubmitted() && $objForm->isValid()) {
 
-            //TODO Consultar. Entra al if de arriba si alguno de los campos es nulo, el error salta luego de procesar todo (en el persist).
-
             //Agrega Cliente a Poliza.
                 $c = $clienteDAO->getObj($poliza->getCliente()->getId());
                 $poliza->setCliente($c);
@@ -477,9 +482,15 @@ class PolizaController extends FOSRestController{
                 $nroPoliza = $this->getCalculonropolizaAction($poliza->getCliente()->getId());
                 $poliza->setNroPoliza($nroPoliza);
 
+           //Referencia a poliza anterior.
+                $poliza->setIdPoliza($polizaDAO->getObj($nroPoliza-1));
+
            //Estado de Poliza es "GENERADA" al crearse. En la BD, tiene el id 4
                 $estadoPoliza = $estadoPolizaDAO->getObj(4);
                 $poliza->setEstadopoliza($estadoPoliza);
+
+           //Calculo de monto total a abonar. Lo hace también el frontend
+                $poliza->setMontoTotalAAbonar($poliza->getPremio()-$poliza->getImportePorDescuento());
 
            //Este se obtiene desde el DAO basandose en los KManio ingresados desde el frontend
                 $ajusteKM = $ajusteKMDAO->getObj($poliza->getKmAnio());
@@ -502,6 +513,7 @@ class PolizaController extends FOSRestController{
                 foreach($vehiculo->getListaMedidas() as $medida){
                     $medidas->add($medidasSeguridadDAO->getObj($medida->getId()));
                 }
+
 
                 $vehiculo->setListaMedidas($medidas);
 
@@ -534,7 +546,6 @@ class PolizaController extends FOSRestController{
                  }
 
            //Cuotas
-                //TODO Validacion de listado de cuotas nulo, consultar donde se realizaria.
                 if (is_array($poliza->getListaCuotas()) || is_object($poliza->getListaCuotas())) {
                     /** @var Cuota $cuota */
                     foreach ($poliza->getListaCuotas() as $cuota) {
@@ -549,6 +560,8 @@ class PolizaController extends FOSRestController{
 
            //Almacena la Poliza en la BD
                 $polizaDAO->save($poliza);
+
+          //TODO Falta llamar a actualizar estado de cliente. No se si hacerlo desde aqui o desde el front. Ver como redirigir llamada
 
                 return $poliza;
 
@@ -582,7 +595,7 @@ class PolizaController extends FOSRestController{
         $cantPoliza = $polizaDAO->countObj($c);
 
 
-        return 8888*10000000+$c->getId()*100+$cantPoliza+1;
+        return 8888*1000000000000+$c->getId()*100+$cantPoliza+1;
 
     }
 
@@ -610,11 +623,80 @@ class PolizaController extends FOSRestController{
 //CU12. Luego de realizar un pago se actualiza el estado de poliza
     /**
      * Debe actualizar el estado de poliza segun los pagos realizados
-     * @param $id
+     * @param $idPoliza
+     * @return string|void
+     * @throws
      */
-    //TODO Implementar
-    public function putAction($id){
+    public function putAction($idPoliza){
 
+        //DAO
+        /** @var EntityManager $em */
+        $em=$this->getDoctrine()->getManager();
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
+
+        //Fecha de hoy
+        $today = new DateTime('today');
+
+        //Obtengo la poliza para modificar
+        //$poliza = new Poliza();
+        $poliza = $polizaDAO->getObj($idPoliza);
+
+        if(is_null($poliza)){
+            return new Response();
+        }
+
+
+        //Obtiene el listado de cuotas
+        $cuotas = $poliza->getListaCuotas();
+
+        foreach($cuotas as $c){
+
+            //Encuentra la primera cuota pendiente de pago.
+            if(is_null($c->getPago())){
+
+                //Calcula la diferencia en días entre la fecha de hoy y la de vencimiento
+                $diferencia = $today->diff($c->getFechaVencimiento());
+                $dias = (int)($diferencia->format('%R%a'));
+
+                //Dias es un valor negativo si la fecha es anterior a la de hoy. Indica la cantidad de dias que ya pasaron desde la fecha
+                if($dias<0){
+                    //Es deudor.
+
+                    //Si la poliza tiene estado Vigente, entonces pasa a estado Suspendida.
+                    //Vigente = 1
+                    //Suspendida = 2
+                    if($poliza->getEstadoPoliza()->getId() == 1){
+
+                        $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(2));
+
+                        $polizaDAO->save($poliza);
+
+                        return new Response();
+                    }
+                    //Si poliza tiene estado suspendida, entonces no hace nada. Retorna
+                    return new Response();
+                }
+                else{
+
+                    //No es deudor. TODO Asume que si la fecha de vencimiento es la de hoy, la poliza todavia sigue vigente hasta que pase la fecha. O pasa a vigente si estaba suspendida
+                    //Si la poliza tiene estado Suspendida, entonces pasa a estado Vigente.
+                    //Vigente = 1
+                    //Suspendida = 2
+                    if($poliza->getEstadoPoliza()->getId() == 2){
+
+                        $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(1));
+
+                        $polizaDAO->save($poliza);
+
+                        return new Response();
+                    }
+                    //Si poliza tiene estado Vigente, entonces no hace nada. Retorna
+                    return new Response();
+                }
+
+            }
+        }
 
     }
 }

@@ -52,7 +52,7 @@ class ModeloController extends FOSRestController
      * @View(serializerEnableMaxDepthChecks=true)
      * @return array
      */
-    //TODO Igual que localidad, ver si agregar lo de id marca
+
     public function cgetAction(){
 
         /** @var EntityManager $em */

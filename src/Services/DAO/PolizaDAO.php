@@ -65,6 +65,27 @@ use App\Entity\Poliza;
         }
 
         /**
+         * @param $cliente
+         * @param $estado
+         * @return mixed
+         * @throws
+         *
+         */
+        public function countPolizaPorEstado($cliente, $estado){
+
+            $dql = "select count(a.nroPoliza)
+                    from App:Poliza a
+                    where a.cliente=:cliente and a.estadoPoliza=:estado";
+
+            $query = $this->em->createQuery($dql);
+            $query->setParameter('cliente', $cliente);
+            $query->setParameter('estado', $estado);
+
+            return $query->getSingleScalarResult();
+
+        }
+
+        /**
          * @param $campo
          * @param $valor
          * @param $estado

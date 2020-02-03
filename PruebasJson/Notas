@@ -7,5 +7,86 @@ public function __construct(){
 
 }
 
+//Argumentos que tendría el metodo de calculo de premio...
+            ->add('tipoCobertura')
+            ->add('localidad')
+            ->add('modelo')
+            ->add('kmAnio')
+            ->add('medidasSeguridad')
+            ->add('cantSiniestros')
+            ->add('cantHijos')
+            ->add('tipoPago')
+            ->add('sumaAsegurada')
+            ->add('cliente')
 
+
+//Alternativa a actualizacion de estado de cliente:
+
+    //DAO:
+            /** @var EntityManager $em */
+            $em = $this->getDoctrine()->getManager();
+            $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+            $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
+            $estadoClienteDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoClienteDAO($em);
+            $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
+
+            //Obtiene referencia a cliente para modificar
+            $c = new Cliente();
+            $c = $clienteDAO->getObj($idCliente);
+
+
+            //Obtiene la cantidad de polizas que tiene asociado el cliente, vigente o no.
+                $cantPoliza = $polizaDAO->countObj($c);
+
+                if($cantPoliza == 1){
+
+                    //Busca estado Normal en la BD y se lo agrega al cliente.
+                    $c->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+                    //Almacena los cambios realizados
+                    $clienteDAO->save($c);
+
+                    return;
+
+                }
+
+            //Buscar polizas que estén vigentes. Si retorna 0, el cliente pasa a estado Normal
+
+                //Estado de poliza de id 1 es estado Vigente
+                $estado = $estadoPolizaDAO->getObj(1);
+                $cantPolizaVig = $polizaDAO->countPolizaPorEstado($c, $estado);
+
+                if($cantPolizaVig==0){
+
+                    //Busca estado Normal en la BD y se lo agrega al cliente.
+                    $c->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+                    //Almacena los cambios realizados
+                    $clienteDAO->save($c);
+
+                    return;
+                }
+
+            //"no estuvo activo ininterrumpido": si, por ejemplo, contrata una poliza por año, se considera que esta inactivo desde el mes 7 al 12.
+            //o sea, una poliza por año cuenta como activo interrumpido
+
+            //Si posee siniestros en el ultimo año (las ultimas dos polizas asociadas al cliente)
+                //normal
+
+            //Cliente no posee siniestros en el ultimo años
+                //Si posee una cuota impaga
+                    //normal
+                //Cliente no posee cuotas impagas
+                    //Cliente activo en los ultimos tres años de forma ininterrumpida
+                    //Dadas estas tres condiciones, con un AND, el estado pasa a ser Plata
+                        //Plata
+                    //No ha sido un cliente activo ininterrumpido al menos los dos ultimos años.
+                    //Dadas estas tres condiciones, con un OR, si se cumple alguna pasa a estado Normal.
+                        //Normal
+
+
+//Cantidad de siniestros, por lo que dice el enunciado, es parte de la poliza, no del cliente. Borre el atributo de cliente
+
+//Si no anda:
+    -Cambie el tamaño de string a 200
 

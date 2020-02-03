@@ -21,7 +21,7 @@ class PolizaModificada
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Column(name="id", type="int", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
@@ -35,7 +35,7 @@ class PolizaModificada
 
     /**
      * @var string
-     * @ORM\Column(name="patente", type="string", length=20, nullable=false)
+     * @ORM\Column(name="patente", type="string", length=30, nullable=false)
      */
     private $patente;
 
@@ -56,6 +56,7 @@ class PolizaModificada
      * @ORM\Column(name="km_anio", type="float", precision=10, scale=0, nullable=false)
      */
     private $kmAnio;
+
 
     /**
      * @var int
@@ -86,7 +87,7 @@ class PolizaModificada
      *
      * @ORM\ManyToOne(targetEntity="TipoCobertura")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="tipoCobertura_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="tipoCobertura_id", referencedColumnName="id", nullable=false)
      * })
      */
     private $tipoCobertura;
@@ -95,7 +96,7 @@ class PolizaModificada
      * @var Poliza
      * @ORM\ManyToOne(targetEntity="Poliza")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="nro_poliza", referencedColumnName="nro_poliza")
+     *   @ORM\JoinColumn(name="nro_poliza", referencedColumnName="nro_poliza", nullable=false)
      * })
      */
     private $poliza;
