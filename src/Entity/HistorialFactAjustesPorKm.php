@@ -23,10 +23,10 @@ class HistorialFactAjustesPorKm
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      */
     private $id;
-
+    //@ORM\GeneratedValue(strategy="IDENTITY")
     /**
      * @var float
      * @ORM\Column(name="ajuste_por_km_realizados", type="float", precision=10, scale=0, nullable=false)

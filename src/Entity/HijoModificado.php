@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
@@ -65,6 +66,8 @@ class HijoModificado
      * })
      */
     private $polizaModificada;
+
+
 
 
 

@@ -23,10 +23,10 @@ class HistFactVehiculo
      *
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      */
     private $id;
-
+    //@ORM\GeneratedValue(strategy="IDENTITY")
     /**
      * @var DateTime
      * @ORM\Column(name="fecha_inicio_vigencia", type="date", nullable=false)

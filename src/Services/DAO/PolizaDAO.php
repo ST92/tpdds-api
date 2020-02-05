@@ -96,7 +96,7 @@ use App\Entity\Poliza;
 
             $dql = "select count(p.nroPoliza)
                     from App:Poliza p join App:Vehiculo v 
-                    where v.".$campo."=:valor and p.estadoPoliza=:es";
+                    where v.".$campo."=:valor and p.estadoPoliza <> :es";
 
             $query = $this->em->createQuery($dql);
             $query->setParameter('valor', $valor);

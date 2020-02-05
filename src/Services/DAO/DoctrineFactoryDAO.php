@@ -167,4 +167,10 @@ class DoctrineFactoryDAO implements IFactoryDAO{
         return new PagoDAO($em);
 
     }
+
+    public function getUsuarioDAO($em){
+
+        return new UsuarioDAO($em);
+
+    }
 }

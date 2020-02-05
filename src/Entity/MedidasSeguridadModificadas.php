@@ -14,6 +14,7 @@ use JMS\Serializer\Annotation\Expose;
  * @ExclusionPolicy("all")
  */
 
+//TODO Entidad que debe eliminarse
 class MedidasSeguridadModificadas
 {
     /**

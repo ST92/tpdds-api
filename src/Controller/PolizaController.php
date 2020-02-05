@@ -131,13 +131,12 @@ class PolizaController extends FOSRestController{
 
 
     /**
-     * Verifica si chasis tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese chasis
+     * Verifica si chasis tiene una poliza vigente o no. Retorna true si EXISTE POLIZA con estado DIFERENTE a FINALIZADA con ese chasis
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param string $chasis
      * @return bool
      */
-    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene el mismo chasis
     public function getValidacionchasisAction($chasis){
 
         /** @var EntityManager $em */
@@ -145,10 +144,10 @@ class PolizaController extends FOSRestController{
         $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
         $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
-        //Estado Vigente/Activa
+        //Estado Finalizado
+        $estado = $estadoPolizaDAO->getObj(3);
 
-        $estado = $estadoPolizaDAO->getObj(1);
-
+        //Cuenta la cantidad de polizas que hay con estado diferente a Finalizado
         $cant = $polizaDAO->findVehiculoActivo("chasis", $chasis, $estado);
 
         if($cant==0){
@@ -162,13 +161,12 @@ class PolizaController extends FOSRestController{
     }
 
     /**
-     * Verifica si motor tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con ese motor
+     * Verifica si motor tiene una poliza vigente o no. Retorna true si EXISTE POLIZA con estado DIFERENTE a FINALIZADA con ese motor
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param string $motor
      * @return bool
      */
-    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene el mismo motor
     public function getValidacionmotorAction($motor){
 
         /** @var EntityManager $em */
@@ -177,7 +175,7 @@ class PolizaController extends FOSRestController{
         $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
         //Estado Vigente/Activa
-        $estado = $estadoPolizaDAO->getObj(1);
+        $estado = $estadoPolizaDAO->getObj(3);
 
         $cant = $polizaDAO->findVehiculoActivo("motor", $motor, $estado);
 
@@ -193,13 +191,12 @@ class PolizaController extends FOSRestController{
 
 
     /**
-     * Verifica si patente tiene una poliza vigente o no. Retorna true si EXISTE POLIZA ACTIVA con esa patente
+     * Verifica si patente tiene una poliza vigente o no. Retorna true si EXISTE POLIZA con estado DIFERENTE a FINALIZADA con esa patente
      *
      * @View(serializerEnableMaxDepthChecks=true)
      * @param string $patente
      * @return bool
      */
-    //TODO Consultar que ocurre si hay una poliza está en estado GENERADA y tiene la misma patente
     public function getValidacionpatenteAction($patente){
 
         /** @var EntityManager $em */
@@ -208,12 +205,13 @@ class PolizaController extends FOSRestController{
         $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
         //Estado Vigente/Activa
-        $estado = $estadoPolizaDAO->getObj(1);
+        $estado = $estadoPolizaDAO->getObj(3);
         $cant = $polizaDAO->findVehiculoActivo("patente", $patente, $estado);
 
         if($cant==0 || $cant == null){
 
             return false;
+
         }
         else{
             return true;
@@ -446,7 +444,6 @@ class PolizaController extends FOSRestController{
      * @return null
      * @throws
      */
-    //TODO Falta implementar si la poliza llega a nro 100. 1 tiene una referencia a la 99?. Como continua despues?
     public function postAction(Request $request){
 
         /** @var EntityManager $em */
@@ -490,10 +487,15 @@ class PolizaController extends FOSRestController{
                 $poliza->setEstadopoliza($estadoPoliza);
 
            //Calculo de monto total a abonar. Lo hace también el frontend
-                $poliza->setMontoTotalAAbonar($poliza->getPremio()-$poliza->getImportePorDescuento());
+                $poliza->setMontoTotalAAbonar($poliza->getPremio()- $poliza->getImportePorDescuento());
 
            //Este se obtiene desde el DAO basandose en los KManio ingresados desde el frontend
                 $ajusteKM = $ajusteKMDAO->getObj($poliza->getKmAnio());
+                if(is_null($ajusteKM)){
+
+                    return (int)(($poliza->getKmAnio())/10000);
+
+                }
                 $poliza->setAjusteskm($ajusteKM);
 
            //Forma de pago.
@@ -561,7 +563,7 @@ class PolizaController extends FOSRestController{
            //Almacena la Poliza en la BD
                 $polizaDAO->save($poliza);
 
-          //TODO Falta llamar a actualizar estado de cliente. No se si hacerlo desde aqui o desde el front. Ver como redirigir llamada
+                $this->actualizarEstadoCliente($poliza);
 
                 return $poliza;
 
@@ -572,6 +574,158 @@ class PolizaController extends FOSRestController{
 
     }
 
+//TODO Implementarlo luego de consultar
+    //Los unicos estados activos son normal o plata
+    /**
+     * @param Poliza $poliza
+     * @return
+     */
+    public function actualizarEstadoCliente($poliza){
+
+        //DAO
+        /** @var EntityManager $em */
+        $em = $this->getDoctrine()->getManager();
+        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
+        $clienteDAO = DoctrineFactoryDAO::getFactory()->getClienteDAO($em);
+        $estadoClienteDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoClienteDAO($em);
+        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
+
+        $cliente = $poliza->getCliente();
+
+        //Revisa la cantidad de polizas del cliente.
+        // Si la unica poliza asociada fue la dada de alta recien (la referencia a poliza anterior es nula, quiere decir que es la primera asociada).
+        // El cliente pasa a estado normal.
+        if(is_null($poliza->getIdPoliza())){
+
+            //Busca estado Normal en la BD y se lo agrega al cliente.
+            $cliente->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+            //Almacena los cambios realizados
+            $clienteDAO->save($cliente);
+
+            return new Response();
+        }
+
+        //Buscar polizas que estén vigentes. Si retorna 0, el cliente pasa a estado Normal
+
+        //Se podría asumir que la ultima poliza, es decir, la anterior a esta, si no está vigente entonces las otras seguro no lo estarían.
+        //Por el tema de los calculos de fecha inicio o fin de vigencia
+        /*if($poliza->getIdPoliza()->getEstadoPoliza()->getId() != 1){
+
+            $poliza->getCliente()->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+            //Almacena los cambios realizados
+            $clienteDAO->save($poliza->getCliente());
+
+            return new Response();
+        }*/
+
+        //De todas formas implemento el conteo por las dudas.
+        //Estado de poliza de id 1 es estado Vigente
+        $estado = $estadoPolizaDAO->getObj(1);
+        $cantPolizaVig = $polizaDAO->countPolizaPorEstado($cliente, $estado);
+
+        if($cantPolizaVig==0){
+
+            //Busca estado Normal en la BD y se lo agrega al cliente.
+            $cliente->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+            //Almacena los cambios realizados
+            $clienteDAO->save($cliente);
+
+            return new Response();
+
+        }
+
+        //Si posee siniestros en el ultimo año
+
+        $siniestros = $poliza->getSiniestroFC();
+
+        //Tiene al menos un siniestro este año (la recientemente dada de alta)
+        if($siniestros->getId() != 4){
+
+            //Busca estado Normal en la BD y se lo agrega al cliente.
+            $cliente->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+            //Almacena los cambios realizados
+            $clienteDAO->save($poliza->getCliente());
+
+
+        }
+
+        //Comienza a buscar en las polizas anteriores a la que fue dada de alta recien cuya fecha de fin de vigencia sea en el ultimo año
+        $now = new DateTime('today');
+        $diferencia = $now->diff($poliza->getIdPoliza()->getFechaFinVigencia());
+        $dias = (int)$diferencia->format('%R%a');
+
+        $poliza = $poliza->getIdPoliza();
+        //Si la diferencia entre la poliza anterior y esta, en días, es menor a 365, quiere decir que la poliza anterior se renovo/dio de alta en el mismo año
+        while($dias<=365 && !is_null($poliza)){
+
+            //Revisar si tiene siniestros
+            //Si es distinto de 4, tiene siniestros en el ultimo año. Pasa a estado normal el cliente
+            if($poliza->getSiniestroFC()->getId()!=4){
+
+                //Busca estado Normal en la BD y se lo agrega al cliente.
+                $cliente->setEnumEstadocliente($estadoClienteDAO->getObj(2));
+
+                //Almacena los cambios realizados
+                $clienteDAO->save($poliza->getCliente());
+
+                return new Response();
+
+            }
+
+            $poliza = $poliza->getIdPoliza();
+
+            if(!is_null($poliza)){
+
+                $diferencia = $now->diff($poliza->getFechaFinVigencia());
+                $dias = (int)$diferencia->format('%R%a');
+
+            }
+
+        }
+
+        //Si lo anterior no anda, probar buscar en la BD directamente y recorrer la lista
+        //Busco las polizas con fecha de inicio de vigencia dentro de un año.
+        //Las agrego a una lista
+        //Recorro la lista y veo si hay siniestros. Si hay una poliza en esa lista que tenga siniestros, pasa a normal y termina
+        //normal
+
+        //Si pasa el while, es porque no tiene siniestros en el ultimo año.
+        //Cliente no posee siniestros en el ultimo año (supera el recorrido poliza por poliza)
+
+
+        //Si posee una cuota impaga normal
+
+
+
+
+        //Cliente no posee cuotas impagas, pasa a la ultima evaluación
+
+
+
+
+
+
+
+
+
+
+        //Cliente activo en los ultimos tres años de forma ininterrumpida.
+        //"no estuvo activo ininterrumpido": si, por ejemplo, contrata una poliza por año, se considera que esta inactivo desde el mes 7 al 12.
+        //o sea, una poliza por año cuenta como activo interrumpido
+        //Dadas estas tres condiciones, con un AND, el estado pasa a ser Plata
+        //Plata
+        //No ha sido un cliente activo ininterrumpido al menos los dos ultimos años.
+        //Dadas estas tres condiciones, con un OR, si se cumple alguna pasa a estado Normal.
+        //Normal
+
+        return new Response();
+
+    }
+
+
 
     /**
      * Calculo nro Poliza. Parametro: id de cliente
@@ -580,7 +734,6 @@ class PolizaController extends FOSRestController{
      * @View(serializerEnableMaxDepthChecks=true)
      * @return mixed
      */
-    //TODO Falta ver cuando cant poliza es mayor a 99
     public function getCalculonropolizaAction($cliente){
 
         /** @var EntityManager $em */
@@ -629,74 +782,7 @@ class PolizaController extends FOSRestController{
      */
     public function putAction($idPoliza){
 
-        //DAO
-        /** @var EntityManager $em */
-        $em=$this->getDoctrine()->getManager();
-        $polizaDAO = DoctrineFactoryDAO::getFactory()->getPolizaDAO($em);
-        $estadoPolizaDAO = DoctrineFactoryDAO::getFactory()->getEnumEstadoPolizaDAO($em);
 
-        //Fecha de hoy
-        $today = new DateTime('today');
-
-        //Obtengo la poliza para modificar
-        //$poliza = new Poliza();
-        $poliza = $polizaDAO->getObj($idPoliza);
-
-        if(is_null($poliza)){
-            return new Response();
-        }
-
-
-        //Obtiene el listado de cuotas
-        $cuotas = $poliza->getListaCuotas();
-
-        foreach($cuotas as $c){
-
-            //Encuentra la primera cuota pendiente de pago.
-            if(is_null($c->getPago())){
-
-                //Calcula la diferencia en días entre la fecha de hoy y la de vencimiento
-                $diferencia = $today->diff($c->getFechaVencimiento());
-                $dias = (int)($diferencia->format('%R%a'));
-
-                //Dias es un valor negativo si la fecha es anterior a la de hoy. Indica la cantidad de dias que ya pasaron desde la fecha
-                if($dias<0){
-                    //Es deudor.
-
-                    //Si la poliza tiene estado Vigente, entonces pasa a estado Suspendida.
-                    //Vigente = 1
-                    //Suspendida = 2
-                    if($poliza->getEstadoPoliza()->getId() == 1){
-
-                        $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(2));
-
-                        $polizaDAO->save($poliza);
-
-                        return new Response();
-                    }
-                    //Si poliza tiene estado suspendida, entonces no hace nada. Retorna
-                    return new Response();
-                }
-                else{
-
-                    //No es deudor. TODO Asume que si la fecha de vencimiento es la de hoy, la poliza todavia sigue vigente hasta que pase la fecha. O pasa a vigente si estaba suspendida
-                    //Si la poliza tiene estado Suspendida, entonces pasa a estado Vigente.
-                    //Vigente = 1
-                    //Suspendida = 2
-                    if($poliza->getEstadoPoliza()->getId() == 2){
-
-                        $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(1));
-
-                        $polizaDAO->save($poliza);
-
-                        return new Response();
-                    }
-                    //Si poliza tiene estado Vigente, entonces no hace nada. Retorna
-                    return new Response();
-                }
-
-            }
-        }
 
     }
 }

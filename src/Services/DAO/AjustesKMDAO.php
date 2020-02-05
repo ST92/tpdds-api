@@ -30,7 +30,8 @@
         public function getObj($kmAnio){
 
             //Los ajustes van de 10000 en 10000
-            $idKm = $kmAnio/10000;
+            //(int)(($poliza->getKmAnio())/10000)
+            $idKm = (int)($kmAnio/10000);
             return $this->em->getRepository(AjustesPorKm::class)->find($idKm+1);
 
         }

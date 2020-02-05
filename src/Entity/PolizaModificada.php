@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\ExclusionPolicy;
 use JMS\Serializer\Annotation\Expose;
@@ -21,7 +22,7 @@ class PolizaModificada
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="int", nullable=false)
+     * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
@@ -102,6 +103,13 @@ class PolizaModificada
     private $poliza;
 
 
+    //Relación bidireccional
+    /**
+     * @ORM\OneToMany(targetEntity="HijoModificado", mappedBy="polizaModificada", cascade={"persist", "remove"})
+     * @var ArrayCollection
+     * @Expose
+     */
+    private $listaHijosMod;
 
 
     //Getters and Setters
@@ -272,6 +280,23 @@ class PolizaModificada
     public function setPoliza(Poliza $nroPoliza){
         $this->poliza = $nroPoliza;
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getListaHijosMod()
+    {
+        return $this->listaHijosMod;
+    }
+
+    /**
+     * @param ArrayCollection $listaHijosMod
+     */
+    public function setListaHijosMod($listaHijosMod)
+    {
+        $this->listaHijosMod = $listaHijosMod;
+    }
+
 
 
 

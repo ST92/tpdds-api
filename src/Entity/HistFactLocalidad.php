@@ -22,10 +22,10 @@ class HistFactLocalidad
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      */
     private $id;
-
+    //@ORM\GeneratedValue(strategy="IDENTITY")
     /**
      * @var float
      * @ORM\Column(name="fact_localidad", type="float", precision=10, scale=0, nullable=false)
@@ -52,7 +52,7 @@ class HistFactLocalidad
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Localidad")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="localidad_id", referencedColumnName="id")
      * })
      */
     private $localidad;
@@ -64,7 +64,7 @@ class HistFactLocalidad
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\OneToOne(targetEntity="Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id", nullable=false)
+     *   @ORM\JoinColumn(name="usuario_id", referencedColumnName="id")
      * })
      */
     private $usuario;

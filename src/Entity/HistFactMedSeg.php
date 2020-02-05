@@ -22,10 +22,10 @@ class HistFactMedSeg
      * @var int
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     *
      */
     private $id;
-
+//@ORM\GeneratedValue(strategy="IDENTITY")
     /**
      * @var string
      * @ORM\Column(name="descripcion", type="string", length=150, nullable=false)

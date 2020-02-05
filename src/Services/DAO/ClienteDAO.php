@@ -67,9 +67,9 @@ class ClienteDAO implements IClienteDAO{
                      $joinWithArray[] = 'JOIN c.enumTipoDni td ';
                      HelperFilter::makeId('td', 'id', $valor, $operators, $filterArray, $paramsArray);
                      break;
-                 case 'estadoCliente.descripcion':
+                 case 'estadoCliente.id':
                      $joinWithArray[] = 'JOIN c.enumEstadoCliente ec ';
-                     HelperFilter::makeString('ec', 'descripcion', $valor, $operators, $filterArray, $paramsArray);
+                     HelperFilter::makeNumeric('ec', 'id', $valor, $operators, $filterArray, $paramsArray);
                      break;
              }
          }
