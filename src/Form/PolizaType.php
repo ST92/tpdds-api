@@ -75,7 +75,7 @@ class PolizaType extends AbstractType
             ->add($builder->create('localidad', LocalidadType::class, ['em' => $options['em']]))
             ->add($builder->create('formapago', FormaPagoType::class, ['em' => $options['em']]))
             ->add($builder->create('siniestro_FC', SiniestrosType::class, ['em' => $options['em']]))
-             ->add($builder->create('cliente', ClienteType::class, ['em' => $options['em']]));
+            ->add($builder->create('cliente', ClienteType::class, ['em' => $options['em']]));
 
     }
 

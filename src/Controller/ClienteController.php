@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\FileinfoMimeTypeGuesser;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Yaml\Tests\A;
 
 
 /**
@@ -60,10 +61,6 @@ class ClienteController extends FOSRestController{
      * @throws
      *
      */
-    //TODO Al agregar un filtro mas a la URL, el = deja de actuar como el startswith
-    // No funciona para el criterio de busqueda "Estado cliente id distinto de 3 o descripcion distinta a Inactivo
-    // EL CRITERIO DE BUSQUEDA ESTADO CLIENTE SIEMPRE ES ACTIVO (id <> 3)
-
     public function cgetAction(ParamFetcherInterface $paramFetcher){
 
         //Obtiene el DAO para realizar la busqueda sobre entidades de tipo Cliente
@@ -78,9 +75,22 @@ class ClienteController extends FOSRestController{
         $filters = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('filters') : array();
         $operators = !is_null($paramFetcher->get('filters')) ? $paramFetcher->get('operators') : array();
 
-        //Retorna los resultados obtenidos
+
+        $clientes = new ArrayCollection();
+        foreach ($clienteDAO->getAllObj($filters, $operators, $order_by, $limit, $offset) as $c){
+
+            //Selecciona los clientes activos
+            if($c->getEnumEstadoCliente()->getId()!=3){
+
+                $clientes->add($c);
+
+            }
+
+        }
+
+
         return [
-            'items' => $clienteDAO->getAllObj($filters, $operators, $order_by, $limit, $offset),
+            'items' => $clientes,
             'filters'=>$filters,
             'operators'=>$operators
         ];

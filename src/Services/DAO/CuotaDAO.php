@@ -29,4 +29,30 @@
             $this->em->flush();
 
         }
+
+        public function countCuotasImpagas($cliente, $estado){
+
+            $dql = "select c
+                    from App:Cliente cl join App:Poliza p join App:Cuota c
+                    where p.cliente= :cli and c.poliza= p and p.estadoPoliza <> :es";
+
+            $query = $this->em->createQuery($dql);
+            $query->setParameter('cli', $cliente);
+            $query->setParameter('es', $estado);
+            //$query->setParameter('nulo', null);
+
+            $cuotas = $query->getResult();
+            $i=0;
+
+            foreach ($cuotas as $c){
+
+                if(is_null($c->getPago())){
+                    $i++;
+                }
+            }
+
+            //return $query->getSingleScalarResult();
+            return $i;
+            //return $query->getResult();
+        }
     }

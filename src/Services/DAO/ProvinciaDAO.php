@@ -39,7 +39,7 @@ class ProvinciaDAO implements IProvinciaDAO {
     public function getAllObj(){
 
         //Es nombre del atributo en Entity, no de BD
-        return $this->em->getRepository(Provincia::class)->findBy([], array('nombreProvincia' => 'ASC'));
+        return $this->em->getRepository(Provincia::class)->findBy([], array('nombre' => 'ASC'));
 
     }
 

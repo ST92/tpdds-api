@@ -44,10 +44,6 @@ https://stackoverflow.com/questions/11605530/symfony2-1-the-option-em-does-not-e
 #Calculo de prima, premio, descuentos
 http://www.softeam.com.ar/manual/Temas_especiales2/Conceptos_basicos_sobre_Seguros.htm
 
-#comando por error al momento de mapear relacion one to many (hijos-poliza, cuotas-poliza). Error estaba en el mappedBy("nro_poliza"). Era mappedBy("poliza")
-
-php bin/console doctrine:schema:validate
-
 #Fechas PHP
 https://www.php.net/manual/es/datetime.examples-arithmetic.php
 
@@ -83,6 +79,7 @@ https://en.wikipedia.org/wiki/Mediator_pattern
 
 #Comando
 php bin/console debug:router
+php bin/console doctrine:schema:validate
 php bin/console doctrine:schema:update --dump-sql
 php bin/console doctrine:schema:update --force
 

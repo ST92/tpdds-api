@@ -112,6 +112,14 @@ class PolizaModificada
     private $listaHijosMod;
 
 
+    /**
+     * @ORM\ManyToMany(targetEntity="MedidasSeguridad", cascade={"persist", "remove"})
+     * @ORM\JoinTable(name="modificacion_ms_vehiculo",joinColumns={@ORM\JoinColumn(name="modificacion_id", referencedColumnName = "id")}, inverseJoinColumns={@ORM\JoinColumn(name="medidasSeguridad_id", referencedColumnName = "id")})
+     * @Expose
+     */
+    private $medidasSeguridad;
+
+
     //Getters and Setters
     /**
      * @return int

@@ -90,3 +90,32 @@ public function __construct(){
 //Si no anda:
     -Cambie el tamaño de string a 200
 
+    /**
+     * @param $fecha
+     * @return string
+     * @throws
+     * @View(serializerEnableMaxDepthChecks=true)
+     *
+     */
+    public function getPruebafechasAction($fecha){
+
+        $f = new DateTime($fecha);
+        //La clave esta en today en lugar de now
+        $now = new DateTime('today');
+
+        $i=0;
+
+        while($i<6){
+
+            $diferencia = $now->diff($f);
+            $f->modify('1 day');
+            $i++;
+        }
+
+
+        //return $diferencia->format('%y-%m-%d');
+        //Al parecer este devuelve bien la diferencia en dias.
+        //return (int)$diferencia->format('%R%a');
+        return $now;
+
+    }

@@ -55,29 +55,6 @@ class PagoController extends FOSRestController
     }
 
 
-    /**
-     * @param $fecha
-     * @return string
-     * @throws
-     * @View(serializerEnableMaxDepthChecks=true)
-     *
-     */
-    public function getPruebafechasAction($fecha)
-    {
-
-        $f = new DateTime($fecha);
-        //La clave esta en today en lugar de now
-        $now = new DateTime('today');
-
-        $diferencia = $now->diff($f);
-
-        //return $diferencia->format('%y-%m-%d');
-        //Al parecer este devuelve bien la diferencia en dias.
-        return (int)$diferencia->format('%R%a');
-
-    }
-
-
 //CU12: Registro de pago de poliza
 
     /**
@@ -94,7 +71,6 @@ class PagoController extends FOSRestController
      * @return ArrayCollection
      * @throws
      */
-    //TODO Consultar sobre los valores de descuento y de tasa de interés
     public function getMontoactualizadocuotasAction($idPoliza)
     {
 
@@ -125,12 +101,17 @@ class PagoController extends FOSRestController
                 if ($dias < 0) {
 
                     //Busca la tasa de interes generada por dias atrasados
-                    $tasa = $this->sistemaFinancieroService->obtenerTasadeinteres();
-
+                    $tasaA = $this->sistemaFinancieroService->obtenerTasadeinteresAnual();
+                    $tasaM = $this->sistemaFinancieroService->obtenerTasadeinteresMensual();
+                    $tasaD = $this->sistemaFinancieroService->obtenerTasadeinteresDiaria();
 
                     //Calculo de regargos. Porcentaje del monto original segun tasa de interes por los días de atraso.
                     //La tasa de interes es por dia (0.01 es fijo)
-                    $recargo = $c->getMonto() * $tasa * $dias * -1;
+                    $a = (int)($dias/365);
+                    $m = (int)(($dias%365)/30);
+                    $d = (int)(($dias%365)%30);
+
+                    $recargo = ($c->getMonto())*($tasaA*$a + $tasaM*$m + $tasaD*$d)*(-1);
 
                     //Actualiza el valor de recargos por el calculado y coloca el valor de bonificacion en cero.
                     $c->setRecargos($recargo);
@@ -171,30 +152,10 @@ class PagoController extends FOSRestController
     }
 
 
-    /**
-     * Recibe arreglo de cuotas seleccionadas a pagar con sus valores actualizados
-     * Retorna el monto total a pagar segun las cuotas seleccionadas
-     */
-    public function getImportetotalapagarAction()
-    {
-
-    }
-
-
-    /**
-     * Recibe el monto total ingresado por el operador y el monto total a pagar calculado anteriormente
-     * Retorna la diferencia entre ambos.
-     * No se si es necesario este metodo
-     */
-    public function getcalculovueltoAction()
-    {
-
-    }
-
 
     /**
      * @param Request $request
-     * @return Pago|FormInterface
+     * @return object|string
      *
      * @View(serializerEnableMaxDepthChecks=true)
      */
@@ -237,10 +198,14 @@ class PagoController extends FOSRestController
             $pago->setListaCuotas($listaCuotas);
             $pagoDAO->save($pago);
 
-            $this->actualizarEstadoPoliza($pago->getListaCuotas()->get(1)->getPoliza()->getIdPoliza());
+            if(is_null($this->actualizarEstadoPoliza($pago->getListaCuotas()->first()->getPoliza()->getNroPoliza()))){
 
-            return $pago;
+                return null;
 
+            }
+
+            //return $pago;
+            return $this->actualizarEstadoPoliza($pago->getListaCuotas()->first()->getPoliza()->getNroPoliza());
         }
 
         return $objForm;
@@ -249,12 +214,10 @@ class PagoController extends FOSRestController
 
     /**
      * @param $idPoliza
-     * @return Response
+     * @return object|string|null
      * @throws
-     *
-     * //TODO Consultar sobre los retornos
      */
-    public function actualizarEstadoPoliza($idPoliza){
+    private function actualizarEstadoPoliza($idPoliza){
 
         //DAO
         /** @var EntityManager $em */
@@ -268,13 +231,14 @@ class PagoController extends FOSRestController
         //Obtengo la poliza para modificar
         $poliza = $polizaDAO->getObj($idPoliza);
         if (is_null($poliza)) {
-            return new Response();
+            return $poliza;
         }
 
+        $arranca = $poliza->getEstadoPoliza()->getId();
         //Obtiene el listado de cuotas
         $cuotas = $poliza->getListaCuotas();
 
-        foreach ($cuotas as $c) {
+        foreach ($poliza->getListaCuotas() as $c) {
 
             //Encuentra la primera cuota pendiente de pago.
             if (is_null($c->getPago())) {
@@ -296,15 +260,17 @@ class PagoController extends FOSRestController
 
                         $polizaDAO->save($poliza);
 
-                        return new Response();
+                        return $poliza;
+                        //return "pasa a suspendida";
                     }
                     //Si poliza tiene estado suspendida, entonces no hace nada. Retorna
-                    return new Response();
+                    //return "queda igual";
+                    return $poliza;
 
                 }
                 else {
 
-                    //No es deudor. TODO Asume que si la fecha de vencimiento es la de hoy, la poliza todavia sigue vigente hasta que pase la fecha. O pasa a vigente si estaba suspendida
+                    //No es deudor. Asume que si la fecha de vencimiento es la de hoy, la poliza todavia sigue vigente hasta que pase la fecha. O pasa a vigente si estaba suspendida
                     //Si la poliza tiene estado Suspendida, entonces pasa a estado Vigente.
                     //Vigente = 1
                     //Suspendida = 2
@@ -315,16 +281,48 @@ class PagoController extends FOSRestController
 
                         $polizaDAO->save($poliza);
 
-                        return new Response();
+                        return $poliza;
+                        //return "pasa a vigente";
                     }
                     //Si poliza tiene estado Vigente, entonces no hace nada. Retorna
-                    return new Response();
+                    return $poliza;
+                    //return "queda igual 2";
                 }
 
             }
+
         }
 
-        return new Response();
+        //Si llega aqui, es porque no tiene cuotas pendiente de pago, por lo que debe cambiar de estado en caso de ser necesario.
+        // Como no es deudor, ya que no posee pagos pendientes, solo queda pasarlo a Vigente o a Finalizada
+
+        $diferencia = $today->diff($poliza->getFechaFinVigencia());
+        $dias = (int)($diferencia->format('%R%a'));
+
+        if($dias<0){
+
+            //Fecha de vigencia ya terminó, pasa a estado finalizada
+            $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(3));
+
+            $polizaDAO->save($poliza);
+
+            return $poliza;
+
+        }
+
+
+        //Si estaba suspendida, pasa a vigente hasta que finalice su vigencia
+        if ($poliza->getEstadoPoliza()->getId() == 2) {
+
+
+            $poliza->setEstadoPoliza($estadoPolizaDAO->getObj(1));
+            $polizaDAO->save($poliza);
+
+            return $poliza;
+
+        }
+
+        return $poliza;
 
     }
 

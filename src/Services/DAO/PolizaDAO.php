@@ -106,5 +106,13 @@ use App\Entity\Poliza;
 
         }
 
+        /**
+         * @return object[]
+         */
+        public function getAllObj(){
+
+            return $this->em->getRepository(Poliza::class)->findBy([], ['nroPoliza' => 'ASC']);
+
+        }
 
     }

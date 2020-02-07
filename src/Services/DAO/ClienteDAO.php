@@ -43,7 +43,7 @@ class ClienteDAO implements IClienteDAO{
      *
      * @return object[]
      */
-    //TODO No está funcionando la busqueda por EstadoCliente <> 3
+
      public function getAllObj($filters, $operators, $order_by, $limit, $offset){
 
          // armo los filtros

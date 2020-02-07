@@ -12,7 +12,17 @@ class SistemaFinancieroService{
         return 0.10;
     }
 
-    public function obtenerTasadeinteres(){
+    public function obtenerTasadeinteresAnual(){
+
+        return 0.1;
+    }
+
+    public function obtenerTasadeinteresMensual(){
+
+        return 0.01;
+    }
+
+    public function obtenerTasadeinteresDiaria(){
 
         return 0.001;
     }

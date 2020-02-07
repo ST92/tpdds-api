@@ -60,7 +60,7 @@ class HijoModificado
     /**
      * @var PolizaModificada
      *
-     * @ORM\ManyToOne(targetEntity="PolizaModificada")
+     * @ORM\ManyToOne(targetEntity="PolizaModificada", inversedBy="listaHijosMod")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="nro_poliza_modif_id", referencedColumnName="id", nullable=false)
      * })
